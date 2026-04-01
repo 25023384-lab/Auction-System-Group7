@@ -7,8 +7,7 @@
 4. Trần Thanh Nhật - 25023348
 
 ## Nhật ký tiến độ
-- **Tuần 1:** Thiết kế Database, tạo Repo (Link Release: Week-1)
-- **Tuần 2:** Viết Logic xử lý nghiệp vụ A (Link Release: Week-2)
+Chưa có
 
 ## Hướng dẫn chạy
 - Cần cài đặt Java 17, IntelliJ IDEA...
