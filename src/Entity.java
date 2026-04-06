@@ -1,5 +1,3 @@
-package src;
-
 public abstract class Entity {
     protected String id;
 

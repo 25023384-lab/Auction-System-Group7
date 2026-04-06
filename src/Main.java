@@ -1,5 +1,3 @@
-package src;
-
 public class Main {
     public static void main(String[] args) {
         // 1. Lấy AuctionManager (Singleton)

@@ -1,5 +1,3 @@
-package src; // Sửa lại tên package cho đúng
-
 public abstract class Item extends Entity {
     private String name;           // Chuyển sang private
     private String description;

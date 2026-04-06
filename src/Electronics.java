@@ -1,5 +1,3 @@
-package src;
-
 public class Electronics extends Item {
     private int warrantyMonths;
 
