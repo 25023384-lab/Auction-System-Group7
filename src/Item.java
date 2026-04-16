@@ -1,8 +1,14 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class Item extends Entity {
-    private String name;           // Chuyển sang private
-    private String description;
-    private double startingPrice;
-    private double currentHighestBid;
+    protected String name;
+    protected double startingPrice;
+    protected double currentHighestBid;
+    protected String highestBidderId;
+    
+    // Danh sách các client đang theo dõi sản phẩm này
+    private transient List<AuctionObserver> observers = new ArrayList<>();
 
     public Item(String id, String name, double startingPrice) {
         super(id);
@@ -11,29 +17,32 @@ public abstract class Item extends Entity {
         this.currentHighestBid = startingPrice;
     }
 
-    // Getter cho name (Alt+Insert)
-    public String getName() {
-        return name;
-    }
-
-    // Getter cho giá hiện tại - CỰC KỲ QUAN TRỌNG để AuctionManager dùng
-    public double getCurrentHighestBid() {
-        return currentHighestBid;
-    }
-    // Getter cho startingPrice
-    public double getStartingPrice() {
-        return startingPrice;
-
-    }
-
     public abstract void printInfo();
 
-    // Tối ưu hàm cập nhật giá
-    public synchronized void updateHighestBid(double newBid) {
-        if (newBid > currentHighestBid) {
-            this.currentHighestBid = newBid;
-        } else {
-            // Có thể thêm thông báo lỗi ở đây nếu cần
+    // Observer Pattern: Đăng ký theo dõi
+    public void addObserver(AuctionObserver observer) {
+        if (!observers.contains(observer)) {
+            observers.add(observer);
         }
     }
+
+    // Observer Pattern: Thông báo cho tất cả client
+    protected void notifyObservers(String message) {
+        for (AuctionObserver obs : observers) {
+            obs.update(message);
+        }
+    }
+
+    // Đã được đồng bộ hóa để tránh Race Condition ở cấp độ Item
+    public synchronized boolean updateHighestBid(double newBid, String bidderId) {
+        if (newBid > currentHighestBid) {
+            this.currentHighestBid = newBid;
+            this.highestBidderId = bidderId;
+            notifyObservers("New highest bid for " + name + ": $" + newBid + " by " + bidderId);
+            return true;
+        }
+        return false;
+    }
+    
+    public double getCurrentHighestBid() { return currentHighestBid; }
 }
