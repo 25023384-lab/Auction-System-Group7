@@ -1,5 +1,12 @@
+<<<<<<< HEAD
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+=======
+package src;
+
+import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+>>>>>>> 2bf0db4 (Tuần 7: Update về xử lý luồng)
 
 public class AuctionManager {
     private static volatile AuctionManager instance;
@@ -7,8 +14,17 @@ public class AuctionManager {
     // Sử dụng ConcurrentHashMap để thread-safe
     private Map<String, Item> activeAuctions;
 
+    private List<BidObserver> observers;
+    private BiddingStrategy strategy;
+
     private AuctionManager() {
+<<<<<<< HEAD
         activeAuctions = new ConcurrentHashMap<>();
+=======
+        activeAuctions = new HashMap<>();
+        observers = new CopyOnWriteArrayList<>();
+        strategy = new DefaultBiddingStrategy();
+>>>>>>> 2bf0db4 (Tuần 7: Update về xử lý luồng)
     }
 
     // Double-Checked Locking Singleton Pattern [cite: 141]
@@ -23,9 +39,20 @@ public class AuctionManager {
         return instance;
     }
 
+    public void addObserver(BidObserver observer) {
+        observers.add(observer);
+    }
+
+    private void notifyObservers(String itemId, double price) {
+        for (BidObserver obs : observers) {
+            obs.update(itemId, price);
+        }
+    }
+
     public void addItem(Item item) {
         activeAuctions.put(item.getId(), item);
     }
+<<<<<<< HEAD
     /**
      * Lấy đối tượng Item đang được đấu giá dựa vào ID
      */
@@ -52,6 +79,23 @@ public class AuctionManager {
             }
         }
         System.out.println(" Bid failed for " + bidderId + ": Amount too low.");
+=======
+
+    public synchronized boolean placeBid(String itemId, String bidderId, double bidAmount) {
+        Item item = activeAuctions.get(itemId);
+
+        if (item != null && strategy.isValidBid(bidAmount, item.getCurrentHighestBid())) {
+            item.updateHighestBid(bidAmount);
+
+            System.out.println("Bid SUCCESS: " + bidderId + " -> " + bidAmount);
+
+            notifyObservers(itemId, bidAmount); // 🔥 Observer
+
+            return true;
+        }
+
+        System.out.println("Bid FAILED by " + bidderId);
+>>>>>>> 2bf0db4 (Tuần 7: Update về xử lý luồng)
         return false;
     }
 

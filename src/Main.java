@@ -1,25 +1,33 @@
+<<<<<<< HEAD
+=======
+package src;
+
+import java.util.concurrent.*;
+
+>>>>>>> 2bf0db4 (Tuần 7: Update về xử lý luồng)
 public class Main {
-    public static void main(String[] args) {
-        // 1. Lấy AuctionManager (Singleton)
+    public static void main(String[] args) throws InterruptedException {
+
         AuctionManager manager = AuctionManager.getInstance();
 
-        // 2. Tạo thử một món đồ điện tử (Dùng Constructor của Tùng)
-        // ID: "E01", Tên: "iPhone 15", Giá gốc: 1000.0, Bảo hành: 12 tháng
-        Electronics iphone = new Electronics("E01", "iPhone 15", 1000.0, 12);
+        // Tạo item
+        Item item = ItemFactory.createItem("electronics", "E01", "Laptop", 1000, 12);
+        manager.addItem(item);
 
-        // 3. Đưa vào hệ thống quản lý
-        manager.addItem(iphone);
-        System.out.println("--- Đã thêm món hàng: " + iphone.getName() + " ---");
-        System.out.println("Giá hiện tại: " + iphone.getCurrentHighestBid());
+        // Observer
+        manager.addObserver(new Bidder("User A"));
+        manager.addObserver(new Bidder("User B"));
 
-        // 4. Thử đặt giá (Test logic của Tùng)
-        System.out.println("\n--- Thử đặt giá 900 (Thấp hơn giá gốc) ---");
-        manager.placeBid("E01", "Nhat_User", 900.0);
+        // Thread Pool
+        ExecutorService executor = Executors.newFixedThreadPool(3);
 
-        System.out.println("\n--- Thử đặt giá 1200 (Hợp lệ) ---");
-        manager.placeBid("E01", "Tung_User", 1200.0);
+        executor.submit(new BidTask("E01", "User1", 1100));
+        executor.submit(new BidTask("E01", "User2", 1200));
+        executor.submit(new BidTask("E01", "User3", 1150));
 
-        // 5. Kiểm tra lại giá cuối cùng
-        System.out.println("\nGiá sau khi đấu giá: " + iphone.getCurrentHighestBid());
+        executor.shutdown();
+        executor.awaitTermination(5, TimeUnit.SECONDS);
+
+        System.out.println("Final price: " + item.getCurrentHighestBid());
     }
 }
