@@ -7,7 +7,9 @@
 4. Trần Thanh Nhật - 25023348
 
 ## Nhật ký tiến độ
-Add files via upload on 4/5/2026 at 10:16 PM
+Add files via upload on 5/4/2026 at 10:16 PM
+Update luồng và disign pattern on 19/4/2026 at 8:50 PM
+
 
 Refactor : Chuẩn hóa OOP, chuyển tất cả thuộc tính từ Protected sang Privated để đảm bảo tính đóng gói, đồng thời fixed lỗi Sigleton cho class AuctionManager ( Thêm các hàm getter,setter) on 4/6/2026 at 6:20 AM
 ## Hướng dẫn chạy
