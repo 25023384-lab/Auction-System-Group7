@@ -1,3 +1,4 @@
+package src;
 public abstract class User extends Entity {
     protected String username;
     protected String role;

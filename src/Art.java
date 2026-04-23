@@ -1,4 +1,5 @@
 // Lớp Art kế thừa Item theo Factory Pattern
+package src;
 public class Art extends Item {
     private String artistName;
 
@@ -9,6 +10,6 @@ public class Art extends Item {
 
     @Override
     public void printInfo() {
-        System.out.println("[Art] " + name + " by " + artistName + " | Start: $" + startingPrice);
+        System.out.println("[Art] " + getName() + " by " + artistName + " | Start: $" + getStartingPrice());
     }
 }

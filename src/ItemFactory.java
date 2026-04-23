@@ -1,3 +1,4 @@
+package src;
 public class ItemFactory {
     public static Item createItem(String type, String id, String name, double price, int extraAttr) {
         switch (type.toLowerCase()) {

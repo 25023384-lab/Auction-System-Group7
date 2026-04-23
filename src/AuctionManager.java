@@ -1,33 +1,26 @@
-<<<<<<< HEAD
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-=======
 package src;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
->>>>>>> 2bf0db4 (Tuần 7: Update về xử lý luồng)
 
 public class AuctionManager {
+    // Double-Checked Locking Singleton kết hợp volatile để an toàn đa luồng
     private static volatile AuctionManager instance;
 
-    // Sử dụng ConcurrentHashMap để thread-safe
+    // Sử dụng ConcurrentHashMap để nhiều luồng có thể truy cập các phiên đấu giá khác nhau cùng lúc
     private Map<String, Item> activeAuctions;
 
+    // Sử dụng CopyOnWriteArrayList để an toàn khi vừa duyệt vừa thêm/xóa Observer
     private List<BidObserver> observers;
     private BiddingStrategy strategy;
 
     private AuctionManager() {
-<<<<<<< HEAD
         activeAuctions = new ConcurrentHashMap<>();
-=======
-        activeAuctions = new HashMap<>();
         observers = new CopyOnWriteArrayList<>();
         strategy = new DefaultBiddingStrategy();
->>>>>>> 2bf0db4 (Tuần 7: Update về xử lý luồng)
     }
 
-    // Double-Checked Locking Singleton Pattern [cite: 141]
     public static AuctionManager getInstance() {
         if (instance == null) {
             synchronized (AuctionManager.class) {
@@ -52,55 +45,45 @@ public class AuctionManager {
     public void addItem(Item item) {
         activeAuctions.put(item.getId(), item);
     }
-<<<<<<< HEAD
-    /**
-     * Lấy đối tượng Item đang được đấu giá dựa vào ID
-     */
+
     public Item getItem(String itemId) {
         return activeAuctions.get(itemId);
     }
-    // Xử lý đấu giá đồng thời an toàn
+
+    /**
+     * Xử lý đấu giá: Kết hợp logic an toàn của Nhật và tính năng của Tuấn
+     */
     public boolean placeBid(String itemId, String bidderId, double bidAmount) {
         Item item = activeAuctions.get(itemId);
+
         if (item == null) {
-            System.out.println("Item not found!");
+            System.out.println("Item not found: " + itemId);
             return false;
         }
 
-        // Lock trên từng sản phẩm thay vì lock toàn bộ Manager để tăng hiệu năng
+        // TỐI ƯU: Chỉ lock trên đốI tượng Item cụ thể thay vì lock toàn bộ phương thức.
+        // Điều này giúp nhiều người có thể đấu giá các món đồ KHÁC NHAU cùng lúc mà không phải chờ nhau.
         synchronized (item) {
-            if (bidAmount > item.getCurrentHighestBid()) {
+            if (strategy.isValidBid(bidAmount, item.getCurrentHighestBid())) {
                 boolean success = item.updateHighestBid(bidAmount, bidderId);
                 if (success) {
-                    System.out.println(" Bid accepted: " + bidderId + " bid $" + bidAmount + " on " + itemId);
-                    checkAndExtendAuctionTime(itemId); // Logic anti-sniping
+                    System.out.println("Bid SUCCESS: " + bidderId + " -> $" + bidAmount + " on " + itemId);
+
+                    // Kích hoạt thông báo cho những người đang quan tâm (Observer)
+                    notifyObservers(itemId, bidAmount);
+
+                    // Chống sniping: Tự động gia hạn thời gian nếu thầu sát giờ cuối
+                    checkAndExtendAuctionTime(itemId);
                     return true;
                 }
             }
         }
-        System.out.println(" Bid failed for " + bidderId + ": Amount too low.");
-=======
 
-    public synchronized boolean placeBid(String itemId, String bidderId, double bidAmount) {
-        Item item = activeAuctions.get(itemId);
-
-        if (item != null && strategy.isValidBid(bidAmount, item.getCurrentHighestBid())) {
-            item.updateHighestBid(bidAmount);
-
-            System.out.println("Bid SUCCESS: " + bidderId + " -> " + bidAmount);
-
-            notifyObservers(itemId, bidAmount); // 🔥 Observer
-
-            return true;
-        }
-
-        System.out.println("Bid FAILED by " + bidderId);
->>>>>>> 2bf0db4 (Tuần 7: Update về xử lý luồng)
+        System.out.println("Bid FAILED for " + bidderId + ": Amount too low or invalid.");
         return false;
     }
 
     private void checkAndExtendAuctionTime(String itemId) {
-        // TODO: Cài đặt logic kiểm tra nếu thời gian hiện tại < X giây so với giờ kết thúc
-        // thì cộng thêm Y giây vào thời gian kết thúc của phiên đấu giá[cite: 90].
+        // TODO: Logic cộng thêm thời gian đấu giá nếu cần
     }
 }
