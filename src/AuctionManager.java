@@ -15,10 +15,22 @@ public class AuctionManager {
     private List<BidObserver> observers;
     private BiddingStrategy strategy;
 
+    // === Các component mới ===
+    private RealtimeNotifier realtime;
+    private AntiSniping antiSniping;
+    private BidAnalytics analytics;
+    private List<BidTransaction> transactionHistory;
+
     private AuctionManager() {
         activeAuctions = new ConcurrentHashMap<>();
         observers = new CopyOnWriteArrayList<>();
         strategy = new DefaultBiddingStrategy();
+
+        // Khởi tạo các component mới
+        realtime = RealtimeNotifier.getInstance();
+        antiSniping = AntiSniping.getInstance();
+        analytics = BidAnalytics.getInstance();
+        transactionHistory = new CopyOnWriteArrayList<>();
     }
 
     public static AuctionManager getInstance() {
@@ -36,7 +48,7 @@ public class AuctionManager {
         observers.add(observer);
     }
 
-    private void notifyObservers(String itemId, double price) {
+    private void notifyObservers(String itemId, double price, String bidderId) {
         for (BidObserver obs : observers) {
             obs.update(itemId, price);
         }
@@ -50,9 +62,24 @@ public class AuctionManager {
         return activeAuctions.get(itemId);
     }
 
-    /**
-     * Xử lý đấu giá: Kết hợp logic an toàn của Nhật và tính năng của Tuấn
-     */
+    // === Advanced: Đăng ký theo dõi item realtime ===
+    public void watchItem(String itemId, Bidder bidder) {
+        realtime.watchItem(itemId, bidder);
+    }
+
+    // === Advanced: Bắt đầu đếm ngược ===
+    public void startCountdown(String itemId, int seconds) {
+        antiSniping.startAuction(itemId, seconds);
+        realtime.startCountdown(itemId, seconds, () -> {
+            System.out.println("🏆 AUCTION CLOSED for " + itemId);
+            Item item = activeAuctions.get(itemId);
+            if (item != null) {
+                System.out.println("Winner: " + item.getHighestBidderId() + " | $" + item.getCurrentHighestBid());
+            }
+        });
+    }
+
+    // === CORE METHOD: Xử lý đấu giá ===
     public boolean placeBid(String itemId, String bidderId, double bidAmount) {
         Item item = activeAuctions.get(itemId);
 
@@ -61,19 +88,35 @@ public class AuctionManager {
             return false;
         }
 
-        // TỐI ƯU: Chỉ lock trên đốI tượng Item cụ thể thay vì lock toàn bộ phương thức.
-        // Điều này giúp nhiều người có thể đấu giá các món đồ KHÁC NHAU cùng lúc mà không phải chờ nhau.
+        // Kiểm tra chống sniping
+        if (!antiSniping.checkAndExtend(itemId)) {
+            System.out.println("Auction ended for " + itemId + "! Cannot bid.");
+            return false;
+        }
+
         synchronized (item) {
             if (strategy.isValidBid(bidAmount, item.getCurrentHighestBid())) {
                 boolean success = item.updateHighestBid(bidAmount, bidderId);
                 if (success) {
                     System.out.println("Bid SUCCESS: " + bidderId + " -> $" + bidAmount + " on " + itemId);
 
-                    // Kích hoạt thông báo cho những người đang quan tâm (Observer)
-                    notifyObservers(itemId, bidAmount);
+                    // Ghi analytics
+                    analytics.recordBid(itemId, bidAmount);
 
-                    // Chống sniping: Tự động gia hạn thời gian nếu thầu sát giờ cuối
-                    checkAndExtendAuctionTime(itemId);
+                    // Gửi realtime notification
+                    realtime.notifyRealtime(itemId, bidAmount, bidderId);
+
+                    // Lưu transaction
+                    BidTransaction tx = new BidTransaction(itemId, bidderId, bidAmount);
+                    tx.markAsWinning();
+                    transactionHistory.add(tx);
+
+                    // Đánh dấu các transaction cũ không còn thắng
+                    markPreviousTransactionsAsLost(itemId);
+
+                    // Notify observers
+                    notifyObservers(itemId, bidAmount, bidderId);
+
                     return true;
                 }
             }
@@ -83,7 +126,54 @@ public class AuctionManager {
         return false;
     }
 
-    private void checkAndExtendAuctionTime(String itemId) {
-        // TODO: Logic cộng thêm thời gian đấu giá nếu cần
+    // Đánh dấu tất cả transaction cũ của item này là không thắng
+    private void markPreviousTransactionsAsLost(String itemId) {
+        for (BidTransaction tx : transactionHistory) {
+            if (tx.getItemId().equals(itemId) && tx.isWinning()) {
+                tx.markAsLost();  // Cần thêm method này trong BidTransaction
+            }
+        }
+    }
+
+    // === Advanced: Thống kê ===
+    public void showAnalytics(String itemId) {
+        analytics.printStats(itemId);
+    }
+
+    // === Advanced: Lấy thời gian còn lại ===
+    public long getRemainingTime(String itemId) {
+        return antiSniping.getRemainingSeconds(itemId);
+    }
+
+    // === Advanced: Xem lịch sử giao dịch ===
+    public void printTransactionHistory(String itemId) {
+        System.out.println("📜 TRANSACTION HISTORY for " + itemId + ":");
+        boolean found = false;
+        for (BidTransaction tx : transactionHistory) {
+            if (tx.getItemId().equals(itemId)) {
+                tx.printInfo();
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("   No transactions yet.");
+        }
+    }
+
+    // === Advanced: Xem tất cả lịch sử ===
+    public void printAllTransactions() {
+        System.out.println("📜 ALL TRANSACTIONS:");
+        if (transactionHistory.isEmpty()) {
+            System.out.println("   No transactions yet.");
+        } else {
+            for (BidTransaction tx : transactionHistory) {
+                tx.printInfo();
+            }
+        }
+    }
+
+    // === Helper: Kiểm tra item còn đấu giá không ===
+    public boolean isAuctionActive(String itemId) {
+        return antiSniping.isAuctionActive(itemId);
     }
 }

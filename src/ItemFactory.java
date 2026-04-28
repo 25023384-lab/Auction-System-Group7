@@ -5,7 +5,7 @@ public class ItemFactory {
             case "electronics":
                 return new Electronics(id, name, price, extraAttr);
             case "art":
-                // return new Art(id, name, price, extraAttr);
+                return new Art(id, name, price, String.valueOf(extraAttr));
             default:
                 throw new IllegalArgumentException("Unknown item type");
         }
