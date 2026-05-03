@@ -6,9 +6,8 @@ import java.util.concurrent.*;
 // Thêm realtime mà không ảnh hưởng code cũ
 public class RealtimeNotifier {
     private static RealtimeNotifier instance;
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);  // newScheduledThreadPool là 1 thread chạy nền để thực hiện task theo thời gian
     private Map<String, List<Bidder>> watchers = new ConcurrentHashMap<>();
-
     private RealtimeNotifier() {}
 
     public static RealtimeNotifier getInstance() {
@@ -22,7 +21,9 @@ public class RealtimeNotifier {
 
     // Đăng ký theo dõi item
     public void watchItem(String itemId, Bidder bidder) {
-        watchers.computeIfAbsent(itemId, k -> new CopyOnWriteArrayList<>()).add(bidder);
+        watchers.computeIfAbsent(itemId, k -> new CopyOnWriteArrayList<>()).add(bidder);  // computeIfAbsent ở đây nghĩa là nếu itemId chưa tồn tại thì tạo list mới,
+                                                                                                    // nếu tồn tại thì sử dụng list cũ, add là thêm người theo dõi vào list.
+        // CopyOnWriteArrayList là một List thread-safe trong Java, hoạt động bằng cách “copy toàn bộ mảng” mỗi khi có thay đổi (add/remove)
     }
 
     // Gửi thông báo realtime (tự động chạy nền)

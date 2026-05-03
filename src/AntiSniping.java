@@ -5,8 +5,8 @@ import java.util.concurrent.*;
 // Advanced: Chống thầu chụp giờ cuối
 public class AntiSniping {
     private static AntiSniping instance;
-    private ConcurrentHashMap<String, Long> auctionEndTime = new ConcurrentHashMap<>();
-    private ConcurrentHashMap<String, ScheduledFuture<?>> extendTasks = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Long> auctionEndTime = new ConcurrentHashMap<>();  // mỗi item có 1 thời điểm kết thúc
+    private ConcurrentHashMap<String, ScheduledFuture<?>> extendTasks = new ConcurrentHashMap<>();    // dùng để:quản lý task gia hạn cancel task nếu cần, hiện tại: chưa sử dụng
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private AntiSniping() {}
@@ -23,7 +23,7 @@ public class AntiSniping {
     // Bắt đầu phiên đấu giá với thời gian (giây)
     public void startAuction(String itemId, int durationSeconds) {
         long endTime = System.currentTimeMillis() + (durationSeconds * 1000L);
-        auctionEndTime.put(itemId, endTime);
+        auctionEndTime.put(itemId, endTime);  // lưu vào map
         System.out.println("🎯 Auction started for " + itemId + " | Ends in " + durationSeconds + "s");
     }
 
@@ -50,7 +50,7 @@ public class AntiSniping {
             return false;
         }
 
-        return true;
+        return true; // đấu giá tiếp tục
     }
 
     public long getRemainingSeconds(String itemId) {
@@ -59,7 +59,7 @@ public class AntiSniping {
         return Math.max(0, (endTime - System.currentTimeMillis()) / 1000);
     }
 
-    // === THÊM METHOD NÀY ===
+    // === THÊM METHOD NÀY === với mục đích kiểm tra xem còn đấu giá không
     public boolean isAuctionActive(String itemId) {
         Long endTime = auctionEndTime.get(itemId);
         if (endTime == null) return false;
