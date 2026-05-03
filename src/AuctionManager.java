@@ -106,13 +106,14 @@ public class AuctionManager {
                     // Gửi realtime notification
                     realtime.notifyRealtime(itemId, bidAmount, bidderId);
 
+                    // Đánh dấu các transaction cũ không còn thắng
+                    markPreviousTransactionsAsLost(itemId);
+
                     // Lưu transaction
                     BidTransaction tx = new BidTransaction(itemId, bidderId, bidAmount);
                     tx.markAsWinning();
                     transactionHistory.add(tx);
 
-                    // Đánh dấu các transaction cũ không còn thắng
-                    markPreviousTransactionsAsLost(itemId);
 
                     // Notify observers
                     notifyObservers(itemId, bidAmount, bidderId);
