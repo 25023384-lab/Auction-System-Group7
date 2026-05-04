@@ -50,7 +50,7 @@ Sơ đồ kế thừa tổng thể:
 ┌───────────────┐ ┌───────────────┐ ┌───────────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐
 │               │ │               │ │               │ │           │ │           │ │           │
 │  Electronics  │ │     Art       │ │   Vehicle*    │ │  Bidder   │ │  Seller*  │ │   Admin*  │
-│               │ │               │ │   (mở rộng)    │ │           │ │           │ │           │
+│               │ │               │ │   (mở rộng)    │ │           │ │          │ |           |
 │───────────────│ │───────────────│ │───────────────│ │───────────│ │───────────│ │───────────│
 │ - warranty    │ │ - artistName  │ │ - engineCC    │ │ - balance │ │ - revenue │ │ - permission│
 │   Months: int │ │   : String    │ │   : int       │ │   : double│ │   : double│ │   Level    │
