@@ -2,6 +2,9 @@ package com.auction.controller;
 
 import com.auction.client.ClientConnection;
 import com.auction.entity.Item;
+import com.auction.entity.Art;
+import com.auction.entity.Electronics;
+import com.auction.entity.Vehicle;
 import com.auction.entity.Message;
 import com.auction.entity.User;
 import com.auction.service.ItemFactory;
@@ -10,10 +13,13 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.Node;
 import javafx.scene.layout.VBox;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.Arrays;
+import java.util.List;
 
 public class CreateItemController {
 
@@ -91,17 +97,17 @@ public class CreateItemController {
                 endMinuteSpinner.getValueFactory().setValue(item.getEndTime().getMinute());
             }
             
-            if (item instanceof com.auction.entity.Electronics) {
+            if (item instanceof Electronics elec) {
                 categoryComboBox.setValue("Electronics");
-                warrantyField.setText(String.valueOf(((com.auction.entity.Electronics) item).getWarrantyMonths()));
-            } else if (item instanceof com.auction.entity.Art) {
+                warrantyField.setText(String.valueOf(elec.getWarrantyMonths()));
+            } else if (item instanceof Art art) {
                 categoryComboBox.setValue("Art");
-                artistField.setText(((com.auction.entity.Art) item).getArtistName());
-            } else if (item instanceof com.auction.entity.Vehicle) {
+                artistField.setText(art.getArtistName());
+            } else if (item instanceof Vehicle vehicle) {
                 categoryComboBox.setValue("Vehicle");
-                makeField.setText(((com.auction.entity.Vehicle) item).getMake());
-                modelField.setText(((com.auction.entity.Vehicle) item).getModel());
-                yearField.setText(String.valueOf(((com.auction.entity.Vehicle) item).getYear()));
+                makeField.setText(vehicle.getMake());
+                modelField.setText(vehicle.getModel());
+                yearField.setText(String.valueOf(vehicle.getYear()));
             }
             categoryComboBox.setDisable(true); // Don't allow changing category when editing
         }
@@ -147,25 +153,25 @@ public class CreateItemController {
 
         // 1. Kiểm tra các trường cơ bản
         if (nameField.getText().trim().isEmpty()) {
-            showError("Item Name is required.");
+            showError("Item Name is required.", nameField);
             return;
         }
         if (descriptionArea.getText().trim().isEmpty()) {
-            showError("Description is required.");
+            showError("Description is required.", descriptionArea);
             return;
         }
         if (priceField.getText().trim().isEmpty()) {
-            showError("Starting Price is required.");
+            showError("Starting Price is required.", priceField);
             return;
         }
         if (startDatePicker.getValue() == null || endDatePicker.getValue() == null) {
-            showError("Please select both Start and End dates.");
+            showError("Please select both Start and End dates.", startDatePicker);
             return;
         }
         
         String category = categoryComboBox.getValue();
         if (category == null) {
-            showError("Please select a Category.");
+            showError("Please select a Category.", categoryComboBox);
             return;
         }
 
@@ -181,28 +187,28 @@ public class CreateItemController {
             LocalDateTime endTime = endDatePicker.getValue().atTime(eHour, eMin);
 
             if (endTime.isBefore(startTime)) {
-                showError("End time must be after start time.");
+                showError("End time must be after start time.", endDatePicker);
                 return;
             }
 
             // 2. Kiểm tra các trường đặc thù
             if (category.equals("Electronics")) {
                 if (warrantyField.getText().trim().isEmpty()) {
-                    showError("Warranty months is required for Electronics.");
+                    showError("Warranty months is required for Electronics.", warrantyField);
                     return;
                 }
             } else if (category.equals("Art")) {
                 if (artistField.getText().trim().isEmpty()) {
-                    showError("Artist name is required for Art.");
+                    showError("Artist name is required for Art.", artistField);
                     return;
                 }
             } else if (category.equals("Vehicle")) {
                 if (makeField.getText().trim().isEmpty() || modelField.getText().trim().isEmpty() || yearField.getText().trim().isEmpty()) {
-                    showError("Make, Model, and Year are required for Vehicle.");
+                    showError("Make, Model, and Year are required for Vehicle.", vehiclePane);
                     return;
                 }
                 if (!yearField.getText().matches("\\d{4}")) {
-                    showError("Year must be a 4-digit number.");
+                    showError("Year must be a 4-digit number.", yearField);
                     return;
                 }
             }
@@ -252,15 +258,34 @@ public class CreateItemController {
             sendThread.start();
 
         } catch (NumberFormatException e) {
-            showError("Price, Warranty, and Year must be valid numbers.");
+            showError("Price, Warranty, and Year must be valid numbers.", priceField);
         } catch (Exception e) {
-            showError("Error: " + e.getMessage());
+            showError("Error: " + e.getMessage(), null);
         }
     }
 
-    private void showError(String msg) {
+    private void showError(String msg, Node fieldToHighlight) {
         messageLabel.setTextFill(javafx.scene.paint.Color.RED);
         messageLabel.setText(msg);
+
+        // Xóa style lỗi khỏi tất cả các trường trước
+        List<Node> allFields = Arrays.asList(nameField, descriptionArea, priceField, startDatePicker, endDatePicker,
+                categoryComboBox, warrantyField, artistField, makeField, modelField, yearField, vehiclePane);
+        for (Node field : allFields) {
+            if (field != null) {
+                field.getStyleClass().remove("error-field");
+            }
+        }
+
+        // Thêm style lỗi cho trường cụ thể
+        if (fieldToHighlight != null) {
+            fieldToHighlight.getStyleClass().add("error-field");
+        }
+    }
+
+    // Phương thức nạp chồng để xử lý các cuộc gọi không có trường cụ thể
+    private void showError(String msg) {
+        showError(msg, null);
     }
 
     @FXML

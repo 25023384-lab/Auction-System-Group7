@@ -4,13 +4,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
 
-<VBox stylesheets="@welcome-style.css" 
-      xmlns="http://javafx.com/javafx/17" 
-      xmlns:fx="http://javafx.com/fxml/1" 
+<VBox stylesheets="@form-style.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.auction.controller.CreateItemController"
-      spacing="25" 
-      style="-fx-padding: 35 40; -fx-background-color: #F4F7F6; -fx-background-radius: 20; -fx-border-radius: 20; -fx-border-color: #0D3A26; -fx-border-width: 1;">
+      styleClass="form-container" spacing="25">
 
     <!-- Header -->
     <VBox spacing="5" alignment="CENTER">
@@ -87,8 +85,12 @@
     <HBox alignment="CENTER_RIGHT" spacing="15" style="-fx-padding: 10 0 0 0;">
         <Label fx:id="messageLabel" style="-fx-font-weight: bold;"/>
         <Pane HBox.hgrow="ALWAYS" />
-        <Button text="Cancel" onAction="#handleCancel" styleClass="btn-outline" prefWidth="120"/>
-        <Button text="Create Item" onAction="#handleCreateItem" styleClass="btn-filled" prefWidth="150"/>
+        <Button text="Cancel" onAction="#handleCancel" styleClass="btn-outline" prefWidth="120" />
+        <Button text="Create Item" onAction="#handleCreateItem" styleClass="btn-filled" prefWidth="150">
+            <graphic>
+                <FontIcon iconLiteral="fas-plus-circle" iconColor="white"/>
+            </graphic>
+        </Button>
     </HBox>
 
 </VBox>

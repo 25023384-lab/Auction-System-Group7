@@ -1,0 +1,74 @@
+/* ==========================================================================
+   General Styles
+   ========================================================================== */
+
+.form-container {
+    -fx-padding: 35 40;
+    -fx-background-color: #F4F7F6;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-border-color: #E0E0E0; /* Màu border nhẹ nhàng hơn */
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 4); /* Thêm hiệu ứng đổ bóng */
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+.label {
+    -fx-font-family: "System";
+    -fx-text-fill: #0D3A26;
+}
+
+.header-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0D3A26;
+}
+
+.header-subtitle {
+    -fx-font-size: 14px;
+    -fx-text-fill: #5E8973;
+}
+
+/* ==========================================================================
+   Form Controls
+   ========================================================================== */
+
+.text-field, .text-area, .combo-box, .date-picker, .spinner {
+    -fx-background-color: white;
+    -fx-border-color: #BDBDBD;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: #9E9E9E;
+    -fx-padding: 5 10;
+}
+
+/* Hiệu ứng khi focus vào ô nhập liệu */
+.text-field:focused, .text-area:focused, .combo-box:focused, .date-picker:focused, .spinner:focused {
+    -fx-border-color: #5E8973; /* Màu xanh lá cây chủ đạo */
+    -fx-border-width: 2;
+}
+
+/* Phản hồi lỗi trực quan */
+.error-field {
+    -fx-border-color: #D32F2F; /* Màu đỏ cho lỗi */
+    -fx-border-width: 2;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+.btn-filled {
+    -fx-background-color: #0D3A26;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.btn-filled:hover {
+    -fx-background-color: #1A533A; /* Màu đậm hơn khi di chuột qua */
+}

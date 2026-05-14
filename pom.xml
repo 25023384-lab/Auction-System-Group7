@@ -74,6 +74,16 @@
             <artifactId>logback-classic</artifactId>
             <version>1.4.8</version>
         </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-javafx</artifactId>
+            <version>12.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.kordamp.ikonli</groupId>
+            <artifactId>ikonli-fontawesome5-pack</artifactId> <!-- Hoặc một bộ icon khác bạn thích -->
+            <version>12.3.1</version>
+        </dependency>
     </dependencies>
 
     <build>
