@@ -48,6 +48,14 @@ public class CreateItemController {
     @FXML
     private TextField artistField;
     @FXML
+    private VBox vehiclePane; // Thêm VBox cho Vehicle
+    @FXML
+    private TextField makeField; // Thêm trường hãng xe
+    @FXML
+    private TextField modelField; // Thêm trường mẫu xe
+    @FXML
+    private TextField yearField; // Thêm trường năm sản xuất
+    @FXML
     private Label messageLabel;
 
     private ClientConnection connection;
@@ -89,6 +97,11 @@ public class CreateItemController {
             } else if (item instanceof com.auction.entity.Art) {
                 categoryComboBox.setValue("Art");
                 artistField.setText(((com.auction.entity.Art) item).getArtistName());
+            } else if (item instanceof com.auction.entity.Vehicle) {
+                categoryComboBox.setValue("VEHICLE");
+                makeField.setText(((com.auction.entity.Vehicle) item).getMake());
+                modelField.setText(((com.auction.entity.Vehicle) item).getModel());
+                yearField.setText(String.valueOf(((com.auction.entity.Vehicle) item).getYear()));
             }
             categoryComboBox.setDisable(true); // Don't allow changing category when editing
         }
@@ -98,7 +111,7 @@ public class CreateItemController {
     public void initialize() {
         // Xóa sạch trước khi thêm để tránh trùng lặp nếu initialize gọi lại
         categoryComboBox.getItems().clear();
-        categoryComboBox.getItems().addAll("Electronics", "Art");
+        categoryComboBox.getItems().addAll("Electronics", "Art", "VEHICLE");
 
         // Khởi tạo Spinner Giờ (0-23) và Phút (0-59)
         startHourSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 8));
@@ -109,11 +122,14 @@ public class CreateItemController {
         categoryComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
             boolean isElectronics = "Electronics".equals(newValue);
             boolean isArt = "Art".equals(newValue);
+            boolean isVehicle = "VEHICLE".equals(newValue);
             
             electronicsPane.setVisible(isElectronics);
             electronicsPane.setManaged(isElectronics);
             artPane.setVisible(isArt);
             artPane.setManaged(isArt);
+            vehiclePane.setVisible(isVehicle);
+            vehiclePane.setManaged(isVehicle);
             
             if (newValue != null) {
                 messageLabel.setText(""); // Xóa thông báo lỗi khi đã chọn category
@@ -149,7 +165,7 @@ public class CreateItemController {
         
         String category = categoryComboBox.getValue();
         if (category == null) {
-            showError("Please select a Category (Electronics or Art).");
+            showError("Please select a Category.");
             return;
         }
 
@@ -180,9 +196,17 @@ public class CreateItemController {
                     showError("Artist name is required for Art.");
                     return;
                 }
+            } else if (category.equals("VEHICLE")) {
+                if (makeField.getText().trim().isEmpty() || modelField.getText().trim().isEmpty() || yearField.getText().trim().isEmpty()) {
+                    showError("Make, Model, and Year are required for Vehicle.");
+                    return;
+                }
+                if (!yearField.getText().matches("\\d{4}")) {
+                    showError("Year must be a 4-digit number.");
+                    return;
+                }
             }
 
-            // ... (phần còn lại giữ nguyên)
             // Tạo ID cho sản phẩm hoặc dùng ID cũ nếu đang Edit
             String itemId = (editingItem != null) ? editingItem.getId() : "ITM_" + UUID.randomUUID().toString().substring(0, 8);
             Item newItem = null;
@@ -193,6 +217,11 @@ public class CreateItemController {
                 newItem = ItemFactory.createItem("electronics", itemId, nameField.getText(), descriptionArea.getText(), price, startTime, endTime, currentSeller.getId(), warranty);
             } else if (category.equals("Art")) {
                 newItem = ItemFactory.createItem("art", itemId, nameField.getText(), descriptionArea.getText(), price, startTime, endTime, currentSeller.getId(), artistField.getText().trim());
+            } else if (category.equals("VEHICLE")) {
+                String make = makeField.getText().trim();
+                String model = modelField.getText().trim();
+                int year = Integer.parseInt(yearField.getText().trim());
+                newItem = ItemFactory.createItem("vehicle", itemId, nameField.getText(), descriptionArea.getText(), price, startTime, endTime, currentSeller.getId(), make, model, year);
             }
 
             if (newItem == null) return;
@@ -223,7 +252,7 @@ public class CreateItemController {
             sendThread.start();
 
         } catch (NumberFormatException e) {
-            showError("Price and Warranty must be valid numbers.");
+            showError("Price, Warranty, and Year must be valid numbers.");
         } catch (Exception e) {
             showError("Error: " + e.getMessage());
         }

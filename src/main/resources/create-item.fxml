@@ -71,6 +71,16 @@
             <Label text="Artist Name:" style="-fx-font-weight: bold; -fx-text-fill: #0D3A26;"/>
             <TextField fx:id="artistField" promptText="e.g., Leonardo da Vinci"/>
         </VBox>
+
+        <VBox fx:id="vehiclePane" spacing="10" managed="false" visible="false" GridPane.rowIndex="6" GridPane.columnIndex="1"
+              style="-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #bdc3c7; -fx-border-radius: 10;">
+            <Label text="Make:" style="-fx-font-weight: bold; -fx-text-fill: #0D3A26;"/>
+            <TextField fx:id="makeField" promptText="e.g., Toyota"/>
+            <Label text="Model:" style="-fx-font-weight: bold; -fx-text-fill: #0D3A26;"/>
+            <TextField fx:id="modelField" promptText="e.g., Camry"/>
+            <Label text="Year:" style="-fx-font-weight: bold; -fx-text-fill: #0D3A26;"/>
+            <TextField fx:id="yearField" promptText="e.g., 2023"/>
+        </VBox>
     </GridPane>
 
     <!-- Footer / Buttons -->

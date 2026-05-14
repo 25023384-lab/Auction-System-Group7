@@ -1,5 +1,6 @@
 package com.auction.dao;
 
+import com.auction.entity.Vehicle;
 import com.auction.entity.Art;
 import com.auction.entity.Electronics;
 import com.auction.entity.Item;
@@ -58,7 +59,12 @@ public class ItemDAO {
                 stmt.setNull(9, Types.INTEGER);
                 stmt.setString(10, ((Art) item).getArtistName());
                 if (!exists) stmt.setString(12, "ART");
-            } else {
+            } else if (item instanceof Vehicle) {
+                stmt.setNull(9, Types.INTEGER);
+                stmt.setNull(10, Types.VARCHAR);
+                if (!exists) stmt.setString(12, "VEHICLE");
+            }
+            else {
                 stmt.setNull(9, Types.INTEGER);
                 stmt.setNull(10, Types.VARCHAR);
                 if (!exists) stmt.setString(12, "GENERAL");
