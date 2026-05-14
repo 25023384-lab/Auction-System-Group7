@@ -3,7 +3,7 @@ package com.auction.service;
 import com.auction.entity.Art;
 import com.auction.entity.Electronics;
 import com.auction.entity.Item;
-
+import com.auction.entity.Vehicle;
 import java.time.LocalDateTime;
 
 public class ItemFactory {
@@ -38,6 +38,15 @@ public class ItemFactory {
                 }
                 String artistName = (String) extraAttrs[0];
                 return new Art(id, name, description, startingPrice, startTime, endTime, sellerId, artistName);
+
+            case "vehicle":
+                if (extraAttrs.length < 3 || !(extraAttrs[0] instanceof String) || !(extraAttrs[1] instanceof String)) {
+                    throw new IllegalArgumentException("Vehicle item requires make, model, and year (String).");
+            }
+                String make = (String) extraAttrs[0];
+                String model = (String) extraAttrs[1];
+                int year = (Integer) extraAttrs[2];
+                return new Vehicle(id, name, description, startingPrice, startTime, endTime, sellerId, make, model, year);
 
             default:
                 throw new IllegalArgumentException("Unknown item type: " + type);

@@ -98,7 +98,7 @@ public class CreateItemController {
                 categoryComboBox.setValue("Art");
                 artistField.setText(((com.auction.entity.Art) item).getArtistName());
             } else if (item instanceof com.auction.entity.Vehicle) {
-                categoryComboBox.setValue("VEHICLE");
+                categoryComboBox.setValue("Vehicle");
                 makeField.setText(((com.auction.entity.Vehicle) item).getMake());
                 modelField.setText(((com.auction.entity.Vehicle) item).getModel());
                 yearField.setText(String.valueOf(((com.auction.entity.Vehicle) item).getYear()));
@@ -111,7 +111,7 @@ public class CreateItemController {
     public void initialize() {
         // Xóa sạch trước khi thêm để tránh trùng lặp nếu initialize gọi lại
         categoryComboBox.getItems().clear();
-        categoryComboBox.getItems().addAll("Electronics", "Art", "VEHICLE");
+        categoryComboBox.getItems().addAll("Electronics", "Art", "Vehicle");
 
         // Khởi tạo Spinner Giờ (0-23) và Phút (0-59)
         startHourSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 8));
@@ -122,7 +122,7 @@ public class CreateItemController {
         categoryComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
             boolean isElectronics = "Electronics".equals(newValue);
             boolean isArt = "Art".equals(newValue);
-            boolean isVehicle = "VEHICLE".equals(newValue);
+            boolean isVehicle = "Vehicle".equals(newValue);
             
             electronicsPane.setVisible(isElectronics);
             electronicsPane.setManaged(isElectronics);
@@ -196,7 +196,7 @@ public class CreateItemController {
                     showError("Artist name is required for Art.");
                     return;
                 }
-            } else if (category.equals("VEHICLE")) {
+            } else if (category.equals("Vehicle")) {
                 if (makeField.getText().trim().isEmpty() || modelField.getText().trim().isEmpty() || yearField.getText().trim().isEmpty()) {
                     showError("Make, Model, and Year are required for Vehicle.");
                     return;
@@ -217,7 +217,7 @@ public class CreateItemController {
                 newItem = ItemFactory.createItem("electronics", itemId, nameField.getText(), descriptionArea.getText(), price, startTime, endTime, currentSeller.getId(), warranty);
             } else if (category.equals("Art")) {
                 newItem = ItemFactory.createItem("art", itemId, nameField.getText(), descriptionArea.getText(), price, startTime, endTime, currentSeller.getId(), artistField.getText().trim());
-            } else if (category.equals("VEHICLE")) {
+            } else if (category.equals("Vehicle")) {
                 String make = makeField.getText().trim();
                 String model = modelField.getText().trim();
                 int year = Integer.parseInt(yearField.getText().trim());
