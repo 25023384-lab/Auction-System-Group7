@@ -1,43 +1,40 @@
 package com.auction.dao;
 
-import com.auction.entity.Vehicle;
 import com.auction.entity.Art;
 import com.auction.entity.Electronics;
 import com.auction.entity.Item;
+import com.auction.entity.Vehicle;
 import com.auction.util.DBHelper;
+
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemDAO {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
 
-    // =========================================================
-    // CREATE / UPDATE — Thêm hoặc cập nhật item
-    // =========================================================
     public void save(Item item) throws SQLException {
-        // Kiểm tra xem item đã tồn tại chưa
         boolean exists = findById(item.getId()) != null;
-
         String sql;
+
         if (exists) {
-            // Câu lệnh UPDATE
             sql = """
                 UPDATE items SET
                     name = ?, description = ?, starting_price = ?, current_bid = ?,
                     highest_bidder_id = ?, start_time = ?, end_time = ?, status = ?,
-                    warranty_months = ?, artist_name = ?
+                    warranty_months = ?, artist_name = ?, make = ?, model = ?, year = ?
                 WHERE id = ?
             """;
         } else {
-            // Câu lệnh INSERT
             sql = """
                 INSERT INTO items (name, description, starting_price, current_bid,
                                    highest_bidder_id, start_time, end_time, status,
-                                   warranty_months, artist_name, id, type, seller_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                   warranty_months, artist_name, make, model, year,
+                                   id, type, seller_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
         }
 
@@ -51,59 +48,60 @@ public class ItemDAO {
             stmt.setString(7, item.getEndTime().format(formatter));
             stmt.setString(8, item.getStatus().name());
 
-            if (item instanceof Electronics) {
-                stmt.setInt(9, ((Electronics) item).getWarrantyMonths());
-                stmt.setNull(10, Types.VARCHAR);
-                if (!exists) stmt.setString(12, "ELECTRONICS");
-            } else if (item instanceof Art) {
+            if (item instanceof Electronics elec) {
+                stmt.setInt(9, elec.getWarrantyMonths());
+                stmt.setNull(10, Types.VARCHAR); // artist_name
+                stmt.setNull(11, Types.VARCHAR); // make
+                stmt.setNull(12, Types.VARCHAR); // model
+                stmt.setNull(13, Types.INTEGER); // year
+            } else if (item instanceof Art art) {
+                stmt.setNull(9, Types.INTEGER); // warranty_months
+                stmt.setString(10, art.getArtistName());
+                stmt.setNull(11, Types.VARCHAR); // make
+                stmt.setNull(12, Types.VARCHAR); // model
+                stmt.setNull(13, Types.INTEGER); // year
+            } else if (item instanceof Vehicle vehicle) {
+                stmt.setNull(9, Types.INTEGER); // warranty_months
+                stmt.setNull(10, Types.VARCHAR); // artist_name
+                stmt.setString(11, vehicle.getMake());
+                stmt.setString(12, vehicle.getModel());
+                stmt.setInt(13, vehicle.getYear());
+            } else {
                 stmt.setNull(9, Types.INTEGER);
-                stmt.setString(10, ((Art) item).getArtistName());
-                if (!exists) stmt.setString(12, "ART");
-            } else if (item instanceof Vehicle) {
-                stmt.setNull(9, Types.INTEGER);
                 stmt.setNull(10, Types.VARCHAR);
-                if (!exists) stmt.setString(12, "VEHICLE");
-            }
-            else {
-                stmt.setNull(9, Types.INTEGER);
-                stmt.setNull(10, Types.VARCHAR);
-                if (!exists) stmt.setString(12, "GENERAL");
+                stmt.setNull(11, Types.VARCHAR);
+                stmt.setNull(12, Types.VARCHAR);
+                stmt.setNull(13, Types.INTEGER);
             }
 
             if (exists) {
-                stmt.setString(11, item.getId());
+                stmt.setString(14, item.getId());
             } else {
-                stmt.setString(11, item.getId());
-                stmt.setString(13, item.getSellerId());
+                stmt.setString(14, item.getId());
+                stmt.setString(15, item.getType());
+                stmt.setString(16, item.getSellerId());
             }
 
             stmt.executeUpdate();
         }
     }
 
-    // =========================================================
-    // READ — tìm theo id
-    // =========================================================
     public Item findById(String id) throws SQLException {
         String sql = "SELECT * FROM items WHERE id = ?";
-
         try (PreparedStatement stmt = DBHelper.getConnection().prepareStatement(sql)) {
             stmt.setString(1, id);
-
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) return mapRowToItem(rs);
+                if (rs.next()) {
+                    return mapRowToItem(rs);
+                }
             }
         }
         return null;
     }
 
-    // =========================================================
-    // READ — lấy tất cả items
-    // =========================================================
     public List<Item> findAll() throws SQLException {
         String sql = "SELECT * FROM items ORDER BY created_at DESC";
         List<Item> list = new ArrayList<>();
-
         try (Statement stmt = DBHelper.getConnection().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -116,7 +114,6 @@ public class ItemDAO {
     public List<Item> findBySeller(String sellerId) throws SQLException {
         String sql = "SELECT * FROM items WHERE seller_id = ? ORDER BY created_at DESC";
         List<Item> list = new ArrayList<>();
-
         try (PreparedStatement stmt = DBHelper.getConnection().prepareStatement(sql)) {
             stmt.setString(1, sellerId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -127,27 +124,34 @@ public class ItemDAO {
         }
         return list;
     }
-    // =========================================================
-    // UPDATE — Cập nhật giá cao nhất và người đặt giá
-    // =========================================================
-    public void updateCurrentBid(String itemId, double bidAmount, String bidderId) throws SQLException {
-        String sql = "UPDATE items SET current_bid = ?, highest_bidder_id = ? WHERE id = ?";
 
+    public void delete(String id) throws SQLException {
+        String sql = "DELETE FROM items WHERE id = ?";
         try (PreparedStatement stmt = DBHelper.getConnection().prepareStatement(sql)) {
-            stmt.setDouble(1, bidAmount);
-            stmt.setString(2, bidderId);
-            stmt.setString(3, itemId);
-
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected == 0) {
-                throw new SQLException("Updating item failed, no rows affected.");
-            }
+            stmt.setString(1, id);
+            stmt.executeUpdate();
         }
     }
 
-    // =========================================================
-    // mapRowToItem — chuyển ResultSet → Item object
-    // =========================================================
+    public void updateStatus(String id, Item.Status status) throws SQLException {
+        String sql = "UPDATE items SET status = ? WHERE id = ?";
+        try (PreparedStatement stmt = DBHelper.getConnection().prepareStatement(sql)) {
+            stmt.setString(1, status.name());
+            stmt.setString(2, id);
+            stmt.executeUpdate();
+        }
+    }
+
+    public void updateCurrentBid(String id, double amount, String bidderId) throws SQLException {
+        String sql = "UPDATE items SET current_bid = ?, highest_bidder_id = ? WHERE id = ?";
+        try (PreparedStatement stmt = DBHelper.getConnection().prepareStatement(sql)) {
+            stmt.setDouble(1, amount);
+            stmt.setString(2, bidderId);
+            stmt.setString(3, id);
+            stmt.executeUpdate();
+        }
+    }
+
     private Item mapRowToItem(ResultSet rs) throws SQLException {
         String id = rs.getString("id");
         String name = rs.getString("name");
@@ -156,15 +160,23 @@ public class ItemDAO {
         LocalDateTime startTime = LocalDateTime.parse(rs.getString("start_time"), formatter);
         LocalDateTime endTime = LocalDateTime.parse(rs.getString("end_time"), formatter);
         String type = rs.getString("type");
+        String sellerId = rs.getString("seller_id");
 
         Item item;
-        String sellerId = rs.getString("seller_id");
+
         if ("ELECTRONICS".equals(type)) {
             int warranty = rs.getInt("warranty_months");
             item = new Electronics(id, name, description, startingPrice, startTime, endTime, sellerId, warranty);
-        } else {
+        } else if ("ART".equals(type)) {
             String artist = rs.getString("artist_name");
             item = new Art(id, name, description, startingPrice, startTime, endTime, sellerId, artist);
+        } else if ("VEHICLE".equals(type)) {
+            String make = rs.getString("make");
+            String model = rs.getString("model");
+            int year = rs.getInt("year");
+            item = new Vehicle(id, name, description, startingPrice, startTime, endTime, sellerId, make, model, year);
+        } else {
+            throw new SQLException("Unknown item type in database: " + type + " for item id: " + id);
         }
 
         item.setCurrentHighestBid(rs.getDouble("current_bid"));
@@ -173,14 +185,4 @@ public class ItemDAO {
 
         return item;
     }
-    
-    public void delete(String id) throws SQLException {
-        String sql = "DELETE FROM items WHERE id = ?";
-        try (PreparedStatement stmt = DBHelper.getConnection().prepareStatement(sql)) {
-            stmt.setString(1, id);
-            stmt.executeUpdate();
-        }
-    }
-    
-    // Các hàm update khác có thể tích hợp vào hàm save()
 }
