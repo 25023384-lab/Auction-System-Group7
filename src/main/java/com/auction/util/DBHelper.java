@@ -44,10 +44,18 @@ public class DBHelper {
                     "end_time TEXT," + // ← ĐỔI KIỂU THÀNH TEXT
                     "warranty_months INTEGER," + // ← THÊM
                     "artist_name TEXT," + // ← THÊM
+                    "engine_cc INTEGER," + // ← THÊM
                     "created_at INTEGER DEFAULT (strftime('%s','now'))," + // ← THÊM
                     "FOREIGN KEY (seller_id) REFERENCES users(id)" +
                     ")";
             stmt.execute(createItemsTable);
+
+            // Đảm bảo cột engine_cc luôn tồn tại cho các database cũ đã chạy trước đó
+            try {
+                stmt.execute("ALTER TABLE items ADD COLUMN engine_cc INTEGER");
+            } catch (SQLException e) {
+                // Bỏ qua nếu cột đã tồn tại
+            }
 
             String createBidsTable = "CREATE TABLE IF NOT EXISTS bids (" +
                     "id TEXT PRIMARY KEY," +

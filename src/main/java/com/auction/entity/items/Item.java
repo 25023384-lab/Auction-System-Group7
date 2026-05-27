@@ -20,7 +20,8 @@ import java.util.List;
 )
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Electronics.class, name = "ELECTRONICS"),
-    @JsonSubTypes.Type(value = Art.class, name = "ART")
+    @JsonSubTypes.Type(value = Art.class, name = "ART"),
+    @JsonSubTypes.Type(value = Vehicle.class, name = "VEHICLE")
 })
 public abstract class Item extends Entity {
 

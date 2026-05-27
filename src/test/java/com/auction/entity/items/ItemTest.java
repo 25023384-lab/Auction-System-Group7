@@ -38,4 +38,18 @@ public class ItemTest {
         assertEquals(6000.0, item.getCurrentHighestBid());
         assertEquals("Bidder1", item.getHighestBidderId());
     }
+
+    @Test
+    void testVehicleCreation() {
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end = start.plusDays(1);
+        Vehicle item = new Vehicle("V1", "Tesla Model S", "Electric Sedan", 80000.0, start, end, "Seller3", 0);
+        
+        assertEquals("V1", item.getId());
+        assertEquals("Tesla Model S", item.getName());
+        assertEquals(80000.0, item.getStartingPrice());
+        assertEquals("VEHICLE", item.getType());
+        assertEquals(0, item.getEngineCC());
+        assertEquals(Item.Status.OPEN, item.getStatus());
+    }
 }

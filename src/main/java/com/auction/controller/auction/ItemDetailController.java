@@ -91,6 +91,11 @@ public class ItemDetailController {
                 if (extraInfoLabel != null && root.get("item").has("artistName")) {
                     extraInfoLabel.setText("Artist: " + root.get("item").get("artistName").asText());
                 }
+            } else if ("VEHICLE".equals(type)) {
+                if (categoryLabel != null) categoryLabel.setText("Vehicle");
+                if (extraInfoLabel != null && root.get("item").has("engineCC")) {
+                    extraInfoLabel.setText("Engine: " + root.get("item").get("engineCC").asInt() + " cc");
+                }
             } else {
                 if (categoryLabel != null) categoryLabel.setText("General");
                 if (extraInfoLabel != null) extraInfoLabel.setText("");

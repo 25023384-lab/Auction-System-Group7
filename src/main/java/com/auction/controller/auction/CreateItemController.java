@@ -5,6 +5,7 @@ import com.auction.entity.items.Electronics;
 import com.auction.entity.items.Item;
 import com.auction.entity.message.Message;
 import com.auction.entity.items.Art;
+import com.auction.entity.items.Vehicle;
 import com.auction.entity.user.User;
 import com.auction.service.factory.ItemFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,6 +50,10 @@ public class CreateItemController {
     @FXML
     private TextField artistField;
     @FXML
+    private VBox vehiclePane;
+    @FXML
+    private TextField engineField;
+    @FXML
     private Label messageLabel;
 
     private ClientConnection connection;
@@ -90,6 +95,9 @@ public class CreateItemController {
             } else if (item instanceof Art) {
                 categoryComboBox.setValue("Art");
                 artistField.setText(((Art) item).getArtistName());
+            } else if (item instanceof Vehicle) {
+                categoryComboBox.setValue("Vehicle");
+                engineField.setText(String.valueOf(((Vehicle) item).getEngineCC()));
             }
             categoryComboBox.setDisable(true); // Don't allow changing category when editing
         }
@@ -99,7 +107,7 @@ public class CreateItemController {
     public void initialize() {
         // Xóa sạch trước khi thêm để tránh trùng lặp nếu initialize gọi lại
         categoryComboBox.getItems().clear();
-        categoryComboBox.getItems().addAll("Electronics", "Art");
+        categoryComboBox.getItems().addAll("Electronics", "Art", "Vehicle");
 
         // Khởi tạo Spinner Giờ (0-23) và Phút (0-59)
         startHourSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 23, 8));
@@ -110,11 +118,14 @@ public class CreateItemController {
         categoryComboBox.getSelectionModel().selectedItemProperty().addListener((options, oldValue, newValue) -> {
             boolean isElectronics = "Electronics".equals(newValue);
             boolean isArt = "Art".equals(newValue);
+            boolean isVehicle = "Vehicle".equals(newValue);
             
             electronicsPane.setVisible(isElectronics);
             electronicsPane.setManaged(isElectronics);
             artPane.setVisible(isArt);
             artPane.setManaged(isArt);
+            vehiclePane.setVisible(isVehicle);
+            vehiclePane.setManaged(isVehicle);
             
             if (newValue != null) {
                 messageLabel.setText(""); // Xóa thông báo lỗi khi đã chọn category
@@ -150,7 +161,7 @@ public class CreateItemController {
         
         String category = categoryComboBox.getValue();
         if (category == null) {
-            showError("Please select a Category (Electronics or Art).");
+            showError("Please select a Category (Electronics, Art or Vehicle).");
             return;
         }
 
@@ -181,6 +192,11 @@ public class CreateItemController {
                     showError("Artist name is required for Art.");
                     return;
                 }
+            } else if (category.equals("Vehicle")) {
+                if (engineField.getText().trim().isEmpty()) {
+                    showError("Engine CC is required for Vehicle.");
+                    return;
+                }
             }
 
             // ... (phần còn lại giữ nguyên)
@@ -194,6 +210,9 @@ public class CreateItemController {
                 newItem = ItemFactory.createItem("electronics", itemId, nameField.getText(), descriptionArea.getText(), price, startTime, endTime, currentSeller.getId(), warranty);
             } else if (category.equals("Art")) {
                 newItem = ItemFactory.createItem("art", itemId, nameField.getText(), descriptionArea.getText(), price, startTime, endTime, currentSeller.getId(), artistField.getText().trim());
+            } else if (category.equals("Vehicle")) {
+                int engineCC = Integer.parseInt(engineField.getText().trim());
+                newItem = ItemFactory.createItem("vehicle", itemId, nameField.getText(), descriptionArea.getText(), price, startTime, endTime, currentSeller.getId(), engineCC);
             }
 
             if (newItem == null) return;
@@ -224,7 +243,7 @@ public class CreateItemController {
             sendThread.start();
 
         } catch (NumberFormatException e) {
-            showError("Price and Warranty must be valid numbers.");
+            showError("Price, Warranty, and Engine CC must be valid numbers.");
         } catch (Exception e) {
             showError("Error: " + e.getMessage());
         }
