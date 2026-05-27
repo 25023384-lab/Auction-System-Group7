@@ -9,15 +9,13 @@ public class AutoBidder {
 
     private static class AutoConfig {
         String bidderId;
-        String itemId;
         double maxBid;
         double increment;
         long   registeredAt;
 
-        AutoConfig(String bidderId, String itemId,
+        AutoConfig(String bidderId,
                    double maxBid, double increment) {
             this.bidderId     = bidderId;
-            this.itemId       = itemId;
             this.maxBid       = maxBid;
             this.increment    = increment;
             this.registeredAt = System.currentTimeMillis();
@@ -38,7 +36,7 @@ public class AutoBidder {
             double maxBid, double increment) {
 
         configs.computeIfAbsent(itemId, k -> new CopyOnWriteArrayList<>())
-                .add(new AutoConfig(bidderId, itemId, maxBid, increment));
+                .add(new AutoConfig(bidderId, maxBid, increment));
 
         System.out.println("🤖 AutoBid registered: " + bidderId
                 + " | max=$" + maxBid + " | step=$" + increment);
@@ -58,8 +56,12 @@ public class AutoBidder {
             if (nextBid <= cfg.maxBid) {
                 System.out.println("🤖 AutoBid firing: " + cfg.bidderId
                         + " → $" + nextBid);
-                boolean ok = manager.placeBid(itemId, cfg.bidderId, nextBid);
-                if (ok) break;
+                try {
+                    boolean ok = manager.placeBid(itemId, cfg.bidderId, nextBid);
+                    if (ok) break;
+                } catch (Exception e) {
+                    System.err.println("🤖 AutoBid failed for " + cfg.bidderId + ": " + e.getMessage());
+                }
             } else {
                 System.out.println("🤖 AutoBid STOPPED for " + cfg.bidderId
                         + ": maxBid $" + cfg.maxBid + " reached");

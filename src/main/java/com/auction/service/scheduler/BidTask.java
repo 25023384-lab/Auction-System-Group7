@@ -17,6 +17,10 @@ public class BidTask implements Runnable {
 
     @Override
     public void run() {
-        auctionManager.placeBid(itemId, user, amount);
+        try {
+            auctionManager.placeBid(itemId, user, amount);
+        } catch (Exception e) {
+            System.err.println("Scheduled bid failed: " + e.getMessage());
+        }
     }
 }

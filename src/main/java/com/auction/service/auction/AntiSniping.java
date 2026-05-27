@@ -6,8 +6,7 @@ import java.util.concurrent.*;
 public class AntiSniping {
     private static AntiSniping instance;
     private ConcurrentHashMap<String, Long> auctionEndTime = new ConcurrentHashMap<>();  // mỗi item có 1 thời điểm kết thúc
-    private ConcurrentHashMap<String, ScheduledFuture<?>> extendTasks = new ConcurrentHashMap<>();    // dùng để:quản lý task gia hạn cancel task nếu cần, hiện tại: chưa sử dụng
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
 
     private AntiSniping() {}
 
@@ -71,5 +70,9 @@ public class AntiSniping {
         Long endTime = auctionEndTime.get(itemId);
         if (endTime == null) return false;
         return getRemainingSeconds(itemId) > 0;
+    }
+
+    public void clearData() {
+        auctionEndTime.clear();
     }
 }
