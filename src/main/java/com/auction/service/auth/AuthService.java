@@ -7,6 +7,7 @@ import com.auction.entity.user.Seller;
 import com.auction.entity.user.User;
 import org.mindrot.jbcrypt.BCrypt;
 
+import com.auction.exception.AuthenticationException;
 import java.sql.SQLException;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ public class AuthService {
     /**
      * Xác thực đăng nhập bằng cách kiểm tra mật khẩu đã hash bằng BCrypt.
      */
-    public User login(String username, String password) {
+    public User login(String username, String password) throws AuthenticationException {
         try {
             UserDAO.UserRecord record = userDAO.findByUsername(username);
             
@@ -37,14 +38,18 @@ public class AuthService {
                         case "ADMIN":
                             return new Admin(record.id, record.username);
                         default:
-                            return null;
+                            throw new AuthenticationException("Unknown user role: " + record.role);
                     }
+                } else {
+                    throw new AuthenticationException("Incorrect password.");
                 }
+            } else {
+                throw new AuthenticationException("Username not found.");
             }
         } catch (SQLException e) {
             System.err.println("Database error during login: " + e.getMessage());
+            throw new AuthenticationException("Database error occurred during login.", e);
         }
-        return null;
     }
 
     /**

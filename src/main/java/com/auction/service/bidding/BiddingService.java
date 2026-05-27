@@ -5,6 +5,9 @@ import com.auction.dao.BidTransactionDAO;
 import com.auction.dao.ItemDAO;
 import com.auction.dao.UserDAO;
 
+import com.auction.exception.InvalidBidException;
+import com.auction.exception.AuctionClosedException;
+
 import java.util.List;
 import java.util.Map;
 
@@ -43,12 +46,16 @@ public class BiddingService {
         this.transactionHistory = transactionHistory;
     }
 
-    public boolean placeBid(String itemId, String bidderId, double bidAmount) {
+    public boolean placeBid(String itemId, String bidderId, double bidAmount) 
+            throws InvalidBidException, AuctionClosedException {
         Item item = activeAuctions.get(itemId);
 
         if (item == null) {
-            System.out.println("Item not found: " + itemId);
-            return false;
+            throw new AuctionClosedException("Item not found: " + itemId);
+        }
+
+        if (item.getStatus() != Item.Status.RUNNING) {
+            throw new AuctionClosedException("Auction is not active (status: " + item.getStatus() + ").");
         }
 
         // Đảm bảo AntiSniping đã biết về item này
@@ -59,8 +66,7 @@ public class BiddingService {
         // Kiểm tra chống sniping và gia hạn nếu cần
         int snipingResult = antiSniping.checkAndExtend(itemId);
         if (snipingResult == -1) {
-            System.out.println("Auction ended for " + itemId + "! Cannot bid.");
-            return false;
+            throw new AuctionClosedException("Auction ended for \"" + item.getName() + "\"! Cannot bid.");
         } else if (snipingResult == 1) {
             // Gia hạn thời gian kết thúc của item
             long rem = antiSniping.getRemainingSeconds(itemId);
@@ -87,9 +93,8 @@ public class BiddingService {
                     System.out.println("DB lookup bidder failed: " + e.getMessage());
                 }
             }
-            if (bidder == null || bidder.getBalance() < bidAmount) {
-                System.out.println("Bid FAILED: Insufficient balance or bidder not found.");
-                return false;
+            if (bidder == null) {
+                throw new InvalidBidException("Bidder not found: " + bidderId);
             }
 
             if (strategy.isValidBid(item.getCurrentHighestBid(), bidAmount)) {
@@ -138,12 +143,14 @@ public class BiddingService {
                     notificationService.notifyObservers(itemId, bidAmount, bidderId);
 
                     return true;
+                } else {
+                    throw new InvalidBidException("Bid could not update highest bid. Amount too low or invalid.");
                 }
+            } else {
+                throw new InvalidBidException("Bid amount too low or invalid. Current highest bid: $" 
+                        + String.format("%.2f", item.getCurrentHighestBid()) + ", your bid: $" + String.format("%.2f", bidAmount));
             }
         }
-
-        System.out.println("Bid FAILED for " + bidderId + ": Amount too low or invalid.");
-        return false;
     }
 
     // Đánh dấu tất cả transaction cũ của item này là không thắng

@@ -35,6 +35,7 @@ public class ItemDetailController {
     @FXML private Label statusLabel;
     @FXML private Label extraInfoLabel;
     @FXML private Button btnPayNow;
+    @FXML private Button btnCancelOrder;
 
     private ClientConnection connection;
     private User currentUser;
@@ -62,7 +63,6 @@ public class ItemDetailController {
             this.currentItem = item;
             String sellerName = root.has("sellerName") ? root.get("sellerName").asText() : "Unknown";
             int bidCount = root.has("bidCount") ? root.get("bidCount").asInt() : 0;
-            double highestBid = root.has("highestBidAmount") ? root.get("highestBidAmount").asDouble() : 0.0;
             String winnerName = root.has("winnerName") ? root.get("winnerName").asText() : "N/A";
 
             // Cập nhật UI an toàn (null-check)
@@ -96,17 +96,19 @@ public class ItemDetailController {
                 if (extraInfoLabel != null) extraInfoLabel.setText("");
             }
 
-            // Hiện nút Pay Now nếu đang FINISHED và user hiện tại là winner
-            if (btnPayNow != null) {
-                if (item.getStatus() == Item.Status.FINISHED 
+            // Kiểm tra trạng thái hiển thị của các nút Pay Now và Cancel Order
+            boolean showButtons = (item.getStatus() == Item.Status.FINISHED 
                     && currentUser != null 
-                    && currentUser.getId().equals(item.getHighestBidderId())) {
-                    btnPayNow.setVisible(true);
-                    btnPayNow.setManaged(true);
-                } else {
-                    btnPayNow.setVisible(false);
-                    btnPayNow.setManaged(false);
-                }
+                    && currentUser.getId().equals(item.getHighestBidderId()));
+
+            if (btnPayNow != null) {
+                btnPayNow.setVisible(showButtons);
+                btnPayNow.setManaged(showButtons);
+            }
+            
+            if (btnCancelOrder != null) {
+                btnCancelOrder.setVisible(showButtons);
+                btnCancelOrder.setManaged(showButtons);
             }
 
         } catch (Exception e) {
@@ -134,6 +136,27 @@ public class ItemDetailController {
             if (response == ButtonType.OK) {
                 try {
                     connection.sendMessage(new Message("PAY_ITEM", currentItem.getId()));
+                    handleClose();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @FXML
+    private void handleCancelOrder() {
+        if (currentItem == null || connection == null) return;
+        
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Confirm Cancellation");
+        alert.setHeaderText("Cancel Order for " + currentItem.getName());
+        alert.setContentText("Are you sure you want to cancel this order? This action cannot be undone and you may be penalized.");
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    connection.sendMessage(new Message("CANCEL_ORDER", currentItem.getId()));
                     handleClose();
                 } catch (Exception e) {
                     e.printStackTrace();

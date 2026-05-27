@@ -19,6 +19,7 @@ import com.auction.dao.BidTransactionDAO;
 import com.auction.dao.ItemDAO;
 import com.auction.dao.UserDAO;
 import com.auction.service.auth.AuthService;
+import com.auction.exception.*;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -136,6 +137,7 @@ public class AuctionServer {
                 case "GET_ITEM_DETAILS":   handleGetItemDetails(msg); break;
                 case "TOP_UP":             handleTopUp(msg); break;
                 case "PAY_ITEM":           handlePayItem(msg); break;
+                case "CANCEL_ORDER":       handleCancelOrder(msg); break;
                 case "GET_ALL_USERS":      handleGetAllUsers(); break;
                 case "DELETE_USER":        handleDeleteUser(msg); break;
                 case "LOGOUT":             handleLogout(); break;
@@ -157,6 +159,9 @@ public class AuctionServer {
                     out.println(objectMapper.writeValueAsString(
                             new Message("LOGIN_FAILED", "Invalid credentials")));
                 }
+            } catch (AuthenticationException e) {
+                out.println(objectMapper.writeValueAsString(
+                        new Message("LOGIN_FAILED", e.getMessage())));
             } catch (Exception e) {
                 out.println(objectMapper.writeValueAsString(new Message("ERROR", e.getMessage())));
             }
@@ -243,6 +248,9 @@ public class AuctionServer {
                     bidUpdate.put("bidderName", bidderName);
                     broadcast(new Message("BID_UPDATE", objectMapper.writeValueAsString(bidUpdate)));
                 }
+            } catch (InvalidBidException | AuctionClosedException e) {
+                out.println(objectMapper.writeValueAsString(
+                        new Message("BID_RESULT", e.getMessage())));
             } catch (Exception e) {
                 out.println(objectMapper.writeValueAsString(new Message("ERROR", e.getMessage())));
             }
@@ -498,6 +506,38 @@ public class AuctionServer {
                     // itemDAO.save(item);
                     // broadcast(new Message("ITEM_STATUS_CHANGED", objectMapper.writeValueAsString(item)));
                 }
+            } catch (Exception e) {
+                try { out.println(objectMapper.writeValueAsString(new Message("ERROR", e.getMessage()))); }
+                catch (Exception ignored) {}
+            }
+        }
+
+        // ===== HỦY ĐƠN HÀNG (CANCEL_ORDER) =====
+        private void handleCancelOrder(Message msg) {
+            try {
+                String itemId = msg.getData();
+                Item item = itemDAO.findById(itemId);
+                
+                if (item == null || item.getStatus() != Item.Status.FINISHED) {
+                    out.println(objectMapper.writeValueAsString(new Message("ERROR", "Invalid item or not finished yet.")));
+                    return;
+                }
+                
+                String winnerId = item.getHighestBidderId();
+                if (winnerId == null || !winnerId.equals(currentUserId)) {
+                    out.println(objectMapper.writeValueAsString(new Message("ERROR", "You are not the winner.")));
+                    return;
+                }
+
+                // Chuyển trạng thái Item thành CANCELED
+                item.setStatus(Item.Status.CANCELED);
+                itemDAO.save(item);
+                auctionManager.addItem(item);
+                
+                // Broadcast cập nhật Item
+                broadcast(new Message("ITEM_STATUS_CHANGED", objectMapper.writeValueAsString(item)));
+                out.println(objectMapper.writeValueAsString(new Message("NOTIFY", "Order has been canceled.")));
+
             } catch (Exception e) {
                 try { out.println(objectMapper.writeValueAsString(new Message("ERROR", e.getMessage()))); }
                 catch (Exception ignored) {}

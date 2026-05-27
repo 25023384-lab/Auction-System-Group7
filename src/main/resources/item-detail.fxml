@@ -44,6 +44,7 @@
     <HBox alignment="CENTER_RIGHT" spacing="10">
         <Label fx:id="bidCountLabel" text="0 bids" style="-fx-text-fill: gray;" />
         <Pane HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnCancelOrder" onAction="#handleCancelOrder" text="Cancel Order" visible="false" managed="false" style="-fx-background-color: red; -fx-text-fill: white;" />
         <Button fx:id="btnPayNow" onAction="#handlePayNow" text="Pay Now" visible="false" managed="false" style="-fx-background-color: orange; -fx-text-fill: white;" />
         <Button onAction="#handleClose" text="Close" prefWidth="80" />
     </HBox>

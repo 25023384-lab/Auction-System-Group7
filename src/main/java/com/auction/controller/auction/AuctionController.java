@@ -251,14 +251,14 @@ public class AuctionController {
                     }
 
                     case "BID_RESULT": {
-                        boolean success = Boolean.parseBoolean(msg.getData());
-                        if (success) {
+                        String responseData = msg.getData();
+                        if ("true".equals(responseData)) {
                             bidMessageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
                             bidMessageLabel.setText("Bid placed successfully!");
                             bidAmountField.clear();
                         } else {
                             bidMessageLabel.setTextFill(javafx.scene.paint.Color.RED);
-                            bidMessageLabel.setText("Bid failed — check balance or amount.");
+                            bidMessageLabel.setText("Bid failed: " + responseData);
                         }
                         break;
                     }
@@ -300,6 +300,11 @@ public class AuctionController {
                                         changedItem.getName(),
                                         winner != null ? winner : "No bids",
                                         changedItem.getCurrentHighestBid());
+                                
+                                // Nếu user hiện tại là người chiến thắng, tự động mở cửa sổ thanh toán
+                                if (currentUser != null && currentUser.getId().equals(winner)) {
+                                    connection.sendMessage(new Message("GET_ITEM_DETAILS", changedItem.getId()));
+                                }
                             } else {
                                 notif = String.format("[STATUS] \"%s\" is now %s",
                                         changedItem.getName(), changedItem.getStatus());
@@ -324,6 +329,16 @@ public class AuctionController {
 
                     case "NOTIFY":
                         addNotification("[INFO] " + msg.getData());
+                        break;
+
+                    case "ERROR":
+                        Platform.runLater(() -> {
+                            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR, msg.getData());
+                            alert.setTitle("Error");
+                            alert.setHeaderText(null);
+                            alert.show();
+                        });
+                        addNotification("[ERROR] " + msg.getData());
                         break;
 
                     case "ITEM_LIST": {

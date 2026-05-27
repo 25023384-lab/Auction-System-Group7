@@ -30,10 +30,8 @@ public class BidTransactionDAO {
             pstmt.setString(1, itemId);
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
-                String id = rs.getString("id");
                 String bidderId = rs.getString("bidder_id");
                 double amount = rs.getDouble("bid_amount");
-                long timestamp = rs.getLong("timestamp");
                 String status = rs.getString("status");
                 BidTransaction bid = new BidTransaction(itemId, bidderId, amount);
                 bid.setStatus(status); // Assume we add setter
