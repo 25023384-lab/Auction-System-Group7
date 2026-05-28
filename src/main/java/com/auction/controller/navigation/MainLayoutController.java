@@ -110,7 +110,7 @@ public class MainLayoutController {
             auctionController.setConnection(connection);
             auctionController.setCurrentUser(currentUser);
             auctionController.setMainLayoutController(this);
-            auctionController.startMessageListener();
+            // auctionController.startMessageListener(); (now handled in setConnection)
             
             contentArea.getChildren().setAll(dashboardView);
         } catch (IOException e) {
