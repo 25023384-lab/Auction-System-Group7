@@ -707,11 +707,49 @@ public class AuctionController {
 
     @FXML
     private void handleTopUp() {
-        TextInputDialog dialog = new TextInputDialog("100");
+        javafx.scene.control.Dialog<String> dialog = new javafx.scene.control.Dialog<>();
         dialog.setTitle("Top Up Balance");
-        dialog.setHeaderText("Add funds to your bidding account");
-        dialog.setContentText("Enter amount ($):");
+        dialog.setHeaderText(null);
+        dialog.setGraphic(null);
 
+        javafx.scene.control.DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getStylesheets().add(getClass().getResource("/welcome-style.css").toExternalForm());
+        dialogPane.getStyleClass().add("modern-dialog");
+
+        // Custom Layout
+        javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(15);
+        content.setStyle("-fx-padding: 10; -fx-background-color: white;");
+        
+        Label titleLabel = new Label("Top Up Balance");
+        titleLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: 900; -fx-text-fill: #0F172A;");
+        
+        Label instructionLabel = new Label("Enter the amount you wish to add to your bidding account:");
+        instructionLabel.setStyle("-fx-text-fill: #64748B; -fx-wrap-text: true;");
+        
+        TextField amountField = new TextField("100");
+        amountField.setStyle("-fx-font-size: 24px; -fx-font-weight: bold; -fx-padding: 10; -fx-alignment: center; -fx-background-color: #F8FAFC; -fx-border-color: #E2E8F0; -fx-border-radius: 8; -fx-text-fill: #2563EB;");
+
+        content.getChildren().addAll(titleLabel, instructionLabel, amountField);
+        dialogPane.setContent(content);
+
+        javafx.scene.control.ButtonType submitButtonType = new javafx.scene.control.ButtonType("Top Up", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
+        dialogPane.getButtonTypes().addAll(submitButtonType, javafx.scene.control.ButtonType.CANCEL);
+
+        // Style the buttons explicitly to override native JavaFX styles
+        javafx.scene.Node submitBtn = dialogPane.lookupButton(submitButtonType);
+        submitBtn.setStyle("-fx-background-color: #2563EB; -fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 14px; -fx-padding: 8 24; -fx-background-radius: 8; -fx-cursor: hand;");
+        
+        javafx.scene.Node cancelBtn = dialogPane.lookupButton(javafx.scene.control.ButtonType.CANCEL);
+        cancelBtn.setStyle("-fx-background-color: white; -fx-border-color: #CBD5E1; -fx-border-radius: 8; -fx-text-fill: #64748B; -fx-font-weight: bold; -fx-font-size: 14px; -fx-padding: 8 24; -fx-cursor: hand;");
+
+        // Result Converter
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == submitButtonType) {
+                return amountField.getText();
+            }
+            return null;
+        });
+        
         java.util.Optional<String> result = dialog.showAndWait();
         result.ifPresent(amountStr -> {
             try {

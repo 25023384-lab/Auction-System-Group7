@@ -11,7 +11,8 @@
     
     <!-- ===== HEADER ===== -->
     <HBox alignment="CENTER_LEFT" spacing="16">
-        <Label text="Live Auctions Dashboard" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+        <Label text="Dashboard" style="-fx-font-size: 24px; -fx-font-weight: 900; -fx-text-fill: #0F172A;"/>
+        <Label text="Here's your overview of live auctions." style="-fx-text-fill: #94A3B8; -fx-font-size: 13px; -fx-padding: 0 0 0 10;"/>
         <Region HBox.hgrow="ALWAYS"/>
         <HBox alignment="CENTER" spacing="10">
             <Label fx:id="userBalanceLabel" text="" 
@@ -52,7 +53,7 @@
 
             <!-- NOTIFICATIONS CARD -->
             <VBox spacing="8" prefHeight="150" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 4); -fx-padding: 15;">
-                <Label text="🔔 Live Notifications" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
+                <Label text="🔔 Live Notifications" style="-fx-font-weight: bold; -fx-text-fill: #0F172A;"/>
                 <ListView fx:id="notificationList" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-color: transparent;">
                     <placeholder>
                         <Label text="No notifications yet." style="-fx-text-fill: #aaa;"/>
@@ -63,64 +64,84 @@
         </VBox>
 
         <!-- ================= RIGHT COLUMN: ACTION CENTER (30%) ================= -->
-        <VBox prefWidth="350" spacing="15">
-            
-            <!-- BIDDING CARD -->
-            <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 4); -fx-padding: 20;">
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: #F1F5F9; -fx-border-color: transparent; -fx-padding: 0;" prefWidth="365">
+            <VBox prefWidth="350" spacing="15" style="-fx-padding: 0 5 0 0;">
                 
-                <!-- Selected Item Header -->
-                <VBox spacing="5">
-                    <Label text="Currently Selected:" style="-fx-font-size: 12px; -fx-text-fill: #7f8c8d;"/>
-                    <Text fx:id="selectedItemText" text="No item selected" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-fill: #2c3e50;"/>
-                </VBox>
-                
-                <Separator/>
-
-                <!-- Manual Bid -->
-                <VBox spacing="10">
-                    <Label text="Manual Bid" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                    <HBox spacing="10">
-                        <TextField fx:id="bidAmountField" promptText="Amount ($)" HBox.hgrow="ALWAYS" style="-fx-pref-height: 35;"/>
-                        <Button text="Place Bid" onAction="#handlePlaceBid" styleClass="btn-filled" style="-fx-pref-height: 35;"/>
+                <!-- BIDDING CARD -->
+                <VBox spacing="15" style="-fx-background-color: white; -fx-background-radius: 16; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 15, 0, 0, 5); -fx-padding: 25;">
+                    
+                    <!-- Header: Title & Selected Item -->
+                    <HBox alignment="CENTER_LEFT">
+                        <Label text="Place a Bid" style="-fx-font-size: 18px; -fx-font-weight: 900; -fx-text-fill: #0F172A;"/>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <HBox alignment="CENTER" style="-fx-background-color: #FEF2F2; -fx-padding: 4 10; -fx-background-radius: 12;">
+                            <Text fx:id="selectedItemText" text="No item selected" style="-fx-font-size: 12px; -fx-fill: #EF4444; -fx-font-weight: bold;"/>
+                        </HBox>
                     </HBox>
+                    
+                    <!-- Manual Bidding Control -->
+                    <VBox spacing="10" alignment="CENTER" style="-fx-padding: 15 0 0 0;">
+                        <Label text="Enter your bid amount:" style="-fx-text-fill: #64748B; -fx-font-size: 12px;"/>
+                        
+                        <HBox alignment="CENTER" spacing="10">
+                            <!-- TextField cho giá -->
+                            <TextField fx:id="bidAmountField" promptText="0.00" alignment="CENTER" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-pref-width: 200; -fx-pref-height: 50; -fx-background-color: transparent; -fx-border-color: #E2E8F0; -fx-border-radius: 8; -fx-text-fill: #0F172A;"/>
+                        </HBox>
+                        <Separator style="-fx-max-width: 160;" />
+                        
+                        <Label text="*Increased by your preference" style="-fx-text-fill: #94A3B8; -fx-font-size: 11px;"/>
+                        
+                        <!-- Submit Button -->
+                        <Button text="SUBMIT YOUR BID" onAction="#handlePlaceBid" maxWidth="Infinity" style="-fx-background-color: #2563EB; -fx-text-fill: white; -fx-font-weight: 900; -fx-font-size: 14px; -fx-padding: 12; -fx-background-radius: 8; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(37,99,235,0.3), 10, 0, 0, 4);">
+                            <VBox.margin>
+                                <javafx.geometry.Insets top="10" />
+                            </VBox.margin>
+                        </Button>
+                    </VBox>
+                    
+                    <Separator style="-fx-padding: 5 0;" />
+                    
+                    <!-- Auto Bid Section -->
+                    <VBox spacing="12">
+                        <HBox alignment="CENTER_LEFT">
+                            <Label text="Auto Bid Limit" style="-fx-font-weight: bold; -fx-text-fill: #64748B; -fx-font-size: 13px;"/>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <HBox alignment="CENTER" style="-fx-background-color: #F1F5F9; -fx-padding: 4 10; -fx-background-radius: 12;">
+                                <Label fx:id="autoBidStatusLabel" text="Off" style="-fx-text-fill: #64748B; -fx-font-size: 11px; -fx-font-weight: bold;"/>
+                            </HBox>
+                        </HBox>
+                        <HBox spacing="10">
+                            <TextField fx:id="maxBidField" promptText="Max Limit ($)" HBox.hgrow="ALWAYS" style="-fx-background-color: #F8FAFC; -fx-border-color: #E2E8F0; -fx-border-radius: 6; -fx-padding: 8; -fx-text-fill: #0F172A;"/>
+                            <TextField fx:id="incrementField" promptText="Step ($)" prefWidth="80" style="-fx-background-color: #F8FAFC; -fx-border-color: #E2E8F0; -fx-border-radius: 6; -fx-padding: 8; -fx-text-fill: #0F172A;"/>
+                        </HBox>
+                        <Button text="Start Auto-Bid" onAction="#handleAutoBid" maxWidth="Infinity" style="-fx-background-color: white; -fx-border-color: #CBD5E1; -fx-border-radius: 6; -fx-text-fill: #0F172A; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 8;"/>
+                    </VBox>
+                    
+                    <Label fx:id="bidMessageLabel" wrapText="true" alignment="CENTER" maxWidth="Infinity" style="-fx-font-size: 12px; -fx-text-fill: #EF4444; -fx-font-weight: bold;"/>
+                    
                 </VBox>
 
-                <!-- Auto Bid -->
-                <VBox spacing="10">
-                    <Label text="Auto-Bid Setup" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                    <HBox spacing="10">
-                        <TextField fx:id="maxBidField" promptText="Max ($)" HBox.hgrow="ALWAYS" style="-fx-pref-height: 35;"/>
-                        <TextField fx:id="incrementField" promptText="Step ($)" HBox.hgrow="ALWAYS" style="-fx-pref-height: 35;"/>
-                    </HBox>
-                    <Button text="Start Auto-Bid" onAction="#handleAutoBid" maxWidth="Infinity" styleClass="btn-outline" style="-fx-pref-height: 35;"/>
-                    <Label fx:id="autoBidStatusLabel" style="-fx-font-size: 11px; -fx-text-fill: #27ae60; -fx-font-weight: bold;"/>
+                <!-- ANALYTICS CARD -->
+                <VBox spacing="10" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 4); -fx-padding: 15;">
+                    <Label text="📊 Price History" style="-fx-font-weight: bold; -fx-text-fill: #0F172A;"/>
+                    <LineChart fx:id="priceChart" prefHeight="180" legendVisible="false" animated="false" style="-fx-padding: 0;">
+                        <xAxis><CategoryAxis label="Time"/></xAxis>
+                        <yAxis><NumberAxis label="Price ($)"/></yAxis>
+                    </LineChart>
+                    
+                    <Separator/>
+                    
+                    <Label text="📜 Bid History" style="-fx-font-weight: bold; -fx-text-fill: #0F172A;"/>
+                    <ListView fx:id="bidHistoryList" prefHeight="150" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                        <placeholder>
+                            <Label text="Select an item to view bids." style="-fx-text-fill: #aaa;"/>
+                        </placeholder>
+                    </ListView>
+
+                    <Button fx:id="viewDetailsButton" text="🔍 View Full Details" onAction="#handleViewDetails" maxWidth="Infinity" styleClass="btn-filled" style="-fx-pref-height: 35;"/>
                 </VBox>
-                
-                <Label fx:id="bidMessageLabel" wrapText="true" style="-fx-font-size: 12px; -fx-text-fill: #e74c3c;"/>
-                
             </VBox>
-
-            <!-- ANALYTICS CARD -->
-            <VBox spacing="10" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0, 0, 4); -fx-padding: 15;">
-                <Label text="📊 Price History" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                <LineChart fx:id="priceChart" prefHeight="180" legendVisible="false" animated="false" style="-fx-padding: 0;">
-                    <xAxis><CategoryAxis label="Time"/></xAxis>
-                    <yAxis><NumberAxis label="Price ($)"/></yAxis>
-                </LineChart>
-                
-                <Separator/>
-                
-                <Label text="📜 Bid History" style="-fx-font-weight: bold; -fx-text-fill: #2c3e50;"/>
-                <ListView fx:id="bidHistoryList" prefHeight="150" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-color: transparent;">
-                    <placeholder>
-                        <Label text="Select an item to view bids." style="-fx-text-fill: #aaa;"/>
-                    </placeholder>
-                </ListView>
-
-                <Button fx:id="viewDetailsButton" text="🔍 View Full Details" onAction="#handleViewDetails" maxWidth="Infinity" styleClass="btn-filled" style="-fx-background-color: #2c3e50; -fx-effect: none; -fx-pref-height: 35;"/>
-            </VBox>
-
-        </VBox>
+        </ScrollPane>
 
     </HBox>
 

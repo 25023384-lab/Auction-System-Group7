@@ -11,19 +11,18 @@ public class AutoBidder {
         String bidderId;
         double maxBid;
         double increment;
-        long   registeredAt;
+        long registeredAt;
 
         AutoConfig(String bidderId,
-                   double maxBid, double increment) {
-            this.bidderId     = bidderId;
-            this.maxBid       = maxBid;
-            this.increment    = increment;
+                double maxBid, double increment) {
+            this.bidderId = bidderId;
+            this.maxBid = maxBid;
+            this.increment = increment;
             this.registeredAt = System.currentTimeMillis();
         }
     }
 
-    private final Map<String, List<AutoConfig>> configs
-            = new ConcurrentHashMap<>();
+    private final Map<String, List<AutoConfig>> configs = new ConcurrentHashMap<>();
 
     private final AuctionManager manager;
 
@@ -44,12 +43,14 @@ public class AutoBidder {
 
     public void onNewBid(String itemId, String winnerBidderId, double currentPrice) {
         List<AutoConfig> list = configs.get(itemId);
-        if (list == null || list.isEmpty()) return;
+        if (list == null || list.isEmpty())
+            return;
 
         list.sort(Comparator.comparingLong(c -> c.registeredAt));
 
         for (AutoConfig cfg : list) {
-            if (cfg.bidderId.equals(winnerBidderId)) continue;
+            if (cfg.bidderId.equals(winnerBidderId))
+                continue;
 
             double nextBid = currentPrice + cfg.increment;
 
@@ -58,7 +59,8 @@ public class AutoBidder {
                         + " → $" + nextBid);
                 try {
                     boolean ok = manager.placeBid(itemId, cfg.bidderId, nextBid);
-                    if (ok) break;
+                    if (ok)
+                        break;
                 } catch (Exception e) {
                     System.err.println("🤖 AutoBid failed for " + cfg.bidderId + ": " + e.getMessage());
                 }

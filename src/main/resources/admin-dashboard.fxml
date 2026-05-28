@@ -4,17 +4,17 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.geometry.Insets?>
 
-<VBox spacing="20" style="-fx-padding: 25; -fx-background-color: #F4F7F6;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.controller.admin.AdminDashboardController" stylesheets="@welcome-style.css">
+<VBox spacing="20" style="-fx-padding: 25; -fx-background-color: transparent;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.controller.admin.AdminDashboardController" stylesheets="@welcome-style.css">
     
     <!-- HEADER -->
     <HBox alignment="CENTER_LEFT" spacing="20">
         <VBox>
-            <Label text="AuexGlobal Authority" style="-fx-font-size: 26; -fx-font-weight: bold; -fx-text-fill: #0D3A26;" />
-            <Label text="System-wide Monitoring & Control" style="-fx-text-fill: #7f8c8d; -fx-font-size: 13;" />
+            <Label text="Admin Panel" style="-fx-font-size: 26; -fx-font-weight: 900; -fx-text-fill: #0F172A;" />
+            <Label text="System-wide Monitoring & Control" style="-fx-text-fill: #94A3B8; -fx-font-size: 13;" />
         </VBox>
         <Region HBox.hgrow="ALWAYS" />
         <HBox spacing="10">
-            <Button text="🔄 Refresh All" onAction="#handleRefreshAll" styleClass="btn-filled" style="-fx-background-color: #3498db;" />
+            <Button text="🔄 Refresh All" onAction="#handleRefreshAll" styleClass="btn-filled" />
         </HBox>
     </HBox>
 
@@ -68,9 +68,9 @@
             </VBox>
 
             <!-- SYSTEM LOGS -->
-            <VBox spacing="10" prefHeight="180" style="-fx-background-color: #0D3A26; -fx-padding: 15; -fx-background-radius: 15;">
-                <Label text="📜 Real-time System Audit" style="-fx-font-weight: bold; -fx-text-fill: #27ae60; -fx-font-size: 14;" />
-                <ListView fx:id="systemLogList" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-control-inner-background: #0D3A26; -fx-border-color: transparent;" stylesheets="@admin-log-style.css"/>
+            <VBox spacing="10" prefHeight="180" style="-fx-background-color: #1E293B; -fx-padding: 15; -fx-background-radius: 15;">
+                <Label text="📜 Real-time System Audit" style="-fx-font-weight: bold; -fx-text-fill: #60A5FA; -fx-font-size: 14;" />
+                <ListView fx:id="systemLogList" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-control-inner-background: #1E293B; -fx-border-color: transparent;" stylesheets="@admin-log-style.css"/>
             </VBox>
         </VBox>
     </HBox>

@@ -1,32 +1,36 @@
 /* ==== STYLE CHÍNH ==== */
 .root {
-    /* Sử dụng các font chữ hiện đại, không chân (sans-serif) */
-    -fx-font-family: "Inter", "Roboto", "Open Sans", "Helvetica Neue", Arial, sans-serif;
-    
-    /* Ghi đè màu viền xanh dương mặc định của JavaFX khi Focus */
-    -fx-focus-color: #27ae60;
-    -fx-faint-focus-color: rgba(39, 174, 96, 0.2);
+    -fx-font-family: "Inter", "Segoe UI", "Roboto", "Open Sans", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-smoothing-type: gray; /* Sửa lỗi vỡ viền chữ (LCD Subpixel Anti-aliasing bug) */
+
+    /* Ghi đè màu viền mặc định khi Focus → Xanh nước biển */
+    -fx-focus-color: #2563EB;
+    -fx-faint-focus-color: rgba(37, 99, 235, 0.2);
 }
 
 /* ==== TEXT FIELDS & PASSWORD FIELDS ==== */
 .text-field, .password-field, .text-area {
+    -fx-background-color: #F8FAFC;
     -fx-background-radius: 8;
     -fx-border-radius: 8;
-    -fx-padding: 10;
-    -fx-border-color: transparent;
-    -fx-border-width: 2px;
-    -fx-highlight-fill: #27ae60; /* Màu nền khi bôi đen văn bản */
+    -fx-padding: 12;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 1.5px;
+    -fx-prompt-text-fill: #94A3B8;
+    -fx-highlight-fill: #2563EB;
     -fx-highlight-text-fill: white;
 }
 
 .text-field:hover, .password-field:hover, .text-area:hover {
-    -fx-border-color: rgba(39, 174, 96, 0.5); /* Nổi viền xanh nhẹ khi hover */
-    -fx-effect: dropshadow(gaussian, rgba(39, 174, 96, 0.2), 10, 0, 0, 2);
+    -fx-border-color: #93C5FD;
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.12), 8, 0, 0, 2);
 }
 
 .text-field:focused, .password-field:focused, .text-area:focused {
-    -fx-border-color: #27ae60; /* Viền xanh lá đậm khi click vào */
-    -fx-effect: dropshadow(gaussian, rgba(39, 174, 96, 0.4), 10, 0, 0, 2);
+    -fx-background-color: white;
+    -fx-border-color: #2563EB;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.25), 10, 0, 0, 2);
 }
 
 .text-area .content {
@@ -34,18 +38,17 @@
     -fx-background-radius: 8;
 }
 
-/* ==== BÊN TRÁI: Gradient Xanh đậm ==== */
+/* ==== BÊN TRÁI: Gradient Xanh Nước Biển ==== */
 .left-pane {
-    /* Tạo dải màu gradient tuyến tính chéo */
-    -fx-background-color: linear-gradient(to bottom right, #0A2B1A, #0D3A26, #1E6646);
+    -fx-background-color: linear-gradient(to bottom right, #0F172A, #1E3A5F, #2563EB);
 }
 
 /* Hình khối trừu tượng mờ ảo */
 .abstract-circle-1 {
-    -fx-fill: linear-gradient(to bottom right, rgba(255,255,255,0.1), rgba(255,255,255,0.0));
+    -fx-fill: linear-gradient(to bottom right, rgba(255,255,255,0.08), rgba(255,255,255,0.0));
 }
 .abstract-circle-2 {
-    -fx-fill: linear-gradient(to top left, rgba(39,174,96,0.3), rgba(39,174,96,0.0));
+    -fx-fill: linear-gradient(to top left, rgba(37,99,235,0.3), rgba(59,130,246,0.0));
 }
 
 /* Chữ Welcome */
@@ -53,12 +56,11 @@
     -fx-fill: white;
     -fx-font-size: 48px;
     -fx-font-weight: 900;
-    /* Có thể thêm letter-spacing để chữ thoáng hơn nếu muốn, nhưng JavaFX mặc định khá tốt */
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 5); /* Đổ bóng chữ */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 5);
 }
 
 .subtitle-text {
-    -fx-fill: #ecf0f1;
+    -fx-fill: #CBD5E1;
     -fx-font-size: 16px;
     -fx-line-spacing: 5px;
 }
@@ -71,70 +73,83 @@
 .form-title {
     -fx-font-size: 28px;
     -fx-font-weight: 800;
-    -fx-text-fill: #2c3e50;
+    -fx-text-fill: #0F172A;
 }
 
 /* Navbar Button */
 .nav-button {
     -fx-background-color: transparent;
-    -fx-text-fill: #7f8c8d;
+    -fx-text-fill: #64748B;
     -fx-font-size: 13px;
     -fx-cursor: hand;
 }
 .nav-button:hover {
-    -fx-text-fill: #27ae60;
+    -fx-text-fill: #2563EB;
 }
 
 /* ==== NÚT BẤM CHÍNH ==== */
-/* 1. Nút Sign Up (Màu xanh, bo tròn) */
+/* 1. Nút chính (Filled - Xanh nước biển) */
 .btn-filled {
-    -fx-background-color: #27ae60;
+    -fx-background-color: #2563EB;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-background-radius: 25; /* Bo tròn cực mạnh giống viên thuốc */
+    -fx-background-radius: 10;
     -fx-cursor: hand;
-    -fx-effect: dropshadow(gaussian, rgba(39,174,96,0.4), 10, 0, 0, 4);
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.25), 8, 0, 0, 3);
 }
 .btn-filled:hover {
-    -fx-background-color: #2ecc71; /* Đổi màu khi hover */
-    -fx-translate-y: -2; /* Hiệu ứng nhấc lên nhẹ */
+    -fx-background-color: #3B82F6;
+    -fx-translate-y: -1;
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.4), 12, 0, 0, 5);
 }
 .btn-filled:pressed {
+    -fx-background-color: #1D4ED8;
     -fx-translate-y: 0;
+    -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.2), 6, 0, 0, 2);
 }
 
-/* 2. Nút Sign In (Viền outline, nền trong) */
+/* 2. Nút outline */
 .btn-outline {
     -fx-background-color: transparent;
-    -fx-border-color: #27ae60;
-    -fx-border-width: 2px;
-    -fx-text-fill: #27ae60;
+    -fx-border-color: #CBD5E1;
+    -fx-border-width: 1.5px;
+    -fx-text-fill: #475569;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
-    -fx-border-radius: 25;
-    -fx-background-radius: 25;
+    -fx-border-radius: 10;
+    -fx-background-radius: 10;
     -fx-cursor: hand;
 }
 .btn-outline:hover {
-    -fx-background-color: rgba(39,174,96,0.1); /* Nền mờ khi hover */
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #94A3B8;
+    -fx-translate-y: -1;
+}
+.btn-outline:pressed {
+    -fx-background-color: #F1F5F9;
+    -fx-translate-y: 0;
 }
 
-/* ==== SIDEBAR BUTTONS ==== */
+/* ==== SIDEBAR BUTTONS (Clean White Theme) ==== */
 .sidebar-btn {
     -fx-background-color: transparent;
-    -fx-text-fill: #5E8973;
+    -fx-text-fill: #475569;
     -fx-font-size: 14px;
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
     -fx-cursor: hand;
-    -fx-background-radius: 8;
+    -fx-background-radius: 10;
 }
 .sidebar-btn:hover {
-    -fx-background-color: rgba(255, 255, 255, 0.05);
-    -fx-text-fill: white;
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #1E293B;
 }
 .sidebar-btn-active {
-    -fx-background-color: rgba(255, 255, 255, 0.1);
+    -fx-background-color: #2563EB;
+    -fx-text-fill: white;
+}
+.sidebar-btn-active:hover {
+    -fx-background-color: #3B82F6;
     -fx-text-fill: white;
 }
 
@@ -142,52 +157,57 @@
 .table-view {
     -fx-background-radius: 8;
     -fx-border-radius: 8;
-    -fx-border-color: #e0e0e0;
+    -fx-border-color: #E2E8F0;
 }
 .table-view .column-header-background {
-    -fx-background-color: #0D3A26;
+    -fx-background-color: #F8FAFC;
     -fx-background-radius: 8 8 0 0;
 }
 .table-view .column-header, .table-view .filler {
     -fx-background-color: transparent;
     -fx-size: 40px;
+    -fx-border-color: transparent transparent #E2E8F0 transparent;
 }
 .table-view .column-header .label {
-    -fx-text-fill: white;
+    -fx-text-fill: #64748B;
     -fx-font-weight: bold;
+    -fx-font-size: 12px;
 }
 .table-row-cell {
-    -fx-cell-size: 35px;
+    -fx-cell-size: 38px;
+    -fx-border-color: transparent transparent #F1F5F9 transparent;
 }
 .table-row-cell:hover {
-    -fx-background-color: rgba(39, 174, 96, 0.1);
+    -fx-background-color: #EFF6FF;
 }
 .table-row-cell:selected {
-    -fx-background-color: #27ae60;
-    -fx-text-fill: white;
+    -fx-background-color: #DBEAFE;
+}
+.table-row-cell:selected .text {
+    -fx-fill: #1E40AF;
 }
 
 /* ==== LIST VIEW ==== */
 .list-view {
     -fx-background-radius: 8;
     -fx-border-radius: 8;
-    -fx-border-color: #e0e0e0;
+    -fx-border-color: #E2E8F0;
 }
 .list-cell:hover {
-    -fx-background-color: rgba(39, 174, 96, 0.1);
+    -fx-background-color: #EFF6FF;
 }
 .list-cell:selected {
-    -fx-background-color: #27ae60;
-    -fx-text-fill: white;
+    -fx-background-color: #DBEAFE;
+    -fx-text-fill: #1E40AF;
 }
 
-/* ==== SPINNER (Dùng cho giờ phút) ==== */
+/* ==== SPINNER ==== */
 .spinner {
-    -fx-background-color: white;
+    -fx-background-color: #F8FAFC;
     -fx-background-radius: 8;
     -fx-border-radius: 8;
-    -fx-border-color: #bdc3c7;
-    -fx-border-width: 1px;
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 1.5px;
 }
 .spinner .text-field {
     -fx-background-color: transparent;
@@ -199,16 +219,16 @@
     -fx-cursor: hand;
 }
 .spinner:focused {
-    -fx-border-color: #27ae60;
+    -fx-border-color: #2563EB;
     -fx-border-width: 2px;
 }
 
 /* ==== DATE PICKER ==== */
 .date-picker {
-    -fx-background-color: white;
+    -fx-background-color: #F8FAFC;
     -fx-background-radius: 8;
     -fx-border-radius: 8;
-    -fx-border-color: #bdc3c7;
+    -fx-border-color: #E2E8F0;
 }
 .date-picker .text-field {
     -fx-background-color: transparent;
@@ -218,23 +238,23 @@
     -fx-cursor: hand;
 }
 .date-picker:focused {
-    -fx-border-color: #27ae60;
+    -fx-border-color: #2563EB;
 }
 
-/* ==== COMBO BOX (Nâng cấp) ==== */
+/* ==== COMBO BOX ==== */
 .combo-box {
-    -fx-background-color: white;
+    -fx-background-color: #F8FAFC;
     -fx-background-radius: 8;
     -fx-border-radius: 8;
-    -fx-border-color: #bdc3c7;
-    -fx-padding: 0; /* Giảm padding để cell chiếm trọn không gian */
+    -fx-border-color: #E2E8F0;
+    -fx-padding: 0;
 }
 .combo-box:hover, .combo-box:focused {
-    -fx-border-color: #27ae60;
+    -fx-border-color: #2563EB;
 }
 .combo-box .cell {
-    -fx-background-radius: 7; /* Nhỏ hơn 1px để không bị tràn viền */
-    -fx-text-fill: #0D3A26;
+    -fx-background-radius: 7;
+    -fx-text-fill: #0F172A;
     -fx-font-weight: bold;
     -fx-padding: 8 12;
 }
@@ -245,13 +265,168 @@
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 5);
 }
 .combo-box .list-cell {
-    -fx-text-fill: #0D3A26;
+    -fx-text-fill: #0F172A;
     -fx-padding: 8 12;
 }
 .combo-box .list-cell:hover {
-    -fx-background-color: rgba(39, 174, 96, 0.1);
+    -fx-background-color: #EFF6FF;
 }
 .combo-box .list-cell:selected {
-    -fx-background-color: #27ae60;
+    -fx-background-color: #2563EB;
     -fx-text-fill: white;
+}
+
+/* ==== CHECK BOX ==== */
+.check-box {
+    -fx-text-fill: #64748B;
+    -fx-font-size: 12px;
+}
+.check-box .box {
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+.check-box:selected .box {
+    -fx-background-color: #2563EB;
+    -fx-border-color: #2563EB;
+}
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+/* ==== ROLE TOGGLE BUTTON ==== */
+.role-toggle {
+    -fx-background-color: #F1F5F9;
+    -fx-background-radius: 10;
+    -fx-text-fill: #64748B;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 12 40;
+    -fx-alignment: center;
+    -fx-cursor: hand;
+}
+.role-toggle:hover {
+    -fx-background-color: #E2E8F0;
+}
+.role-toggle:selected {
+    -fx-background-color: #2563EB;
+    -fx-text-fill: white;
+}
+/* Giấu cái chấm tròn đi */
+.role-toggle > .radio, .role-toggle > .radio > .dot {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-padding: 0;
+    -fx-min-width: 0;
+    -fx-max-width: 0;
+    -fx-pref-width: 0;
+    -fx-min-height: 0;
+    -fx-max-height: 0;
+    -fx-pref-height: 0;
+}
+
+/* ==== HYPERLINK ==== */
+.hyperlink {
+    -fx-text-fill: #2563EB;
+    -fx-font-weight: bold;
+    -fx-border-color: transparent;
+}
+.hyperlink:hover {
+    -fx-text-fill: #3B82F6;
+    -fx-underline: true;
+}
+
+/* ==== LABEL FIELD (nhãn nhỏ phía trên input) ==== */
+.field-label {
+    -fx-text-fill: #334155;
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+}
+
+/* ==== MODERN DIALOG (Top Up, etc.) ==== */
+.modern-dialog.dialog-pane {
+    -fx-background-color: white;
+    -fx-background-radius: 16;
+    -fx-padding: 20;
+}
+.modern-dialog.dialog-pane .header-panel {
+    -fx-background-color: #2563EB;
+    -fx-background-radius: 12;
+    -fx-padding: 15;
+}
+.modern-dialog.dialog-pane .header-panel .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+.modern-dialog.dialog-pane .button-bar {
+    -fx-background-color: #F8FAFC;
+    -fx-background-radius: 0 0 16 16;
+    -fx-padding: 10 20;
+}
+.modern-dialog.dialog-pane .button[default="true"] {
+    -fx-background-color: #2563EB;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 8;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+.modern-dialog.dialog-pane .button[default="true"]:hover {
+    -fx-background-color: #3B82F6;
+}
+.modern-dialog.dialog-pane .button[default="false"] {
+    -fx-background-color: transparent;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+    -fx-text-fill: #475569;
+    -fx-font-weight: bold;
+    -fx-padding: 8 20;
+    -fx-cursor: hand;
+}
+.modern-dialog.dialog-pane .button[default="false"]:hover {
+    -fx-background-color: #F1F5F9;
+    -fx-text-fill: #0F172A;
+}
+
+/* ==== THANH CUỘN (SCROLL BAR) HIỆN ĐẠI ==== */
+.scroll-bar:vertical, .scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+.scroll-bar:vertical {
+    -fx-pref-width: 6px;
+}
+.scroll-bar:horizontal {
+    -fx-pref-height: 6px;
+}
+.scroll-bar .track {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-background-radius: 3px;
+}
+.scroll-bar .thumb {
+    -fx-background-color: #CBD5E1;
+    -fx-background-radius: 3px;
+}
+.scroll-bar .thumb:hover {
+    -fx-background-color: #94A3B8;
+}
+.scroll-bar .thumb:pressed {
+    -fx-background-color: #64748B;
+}
+.scroll-bar .increment-button, .scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0;
+    -fx-padding: 0;
+}
+.scroll-bar .increment-arrow, .scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
+}
+
+/* ==== SEPARATOR ==== */
+.separator .line {
+    -fx-border-color: #E2E8F0;
+    -fx-border-width: 1 0 0 0;
 }

@@ -19,7 +19,8 @@ import com.auction.exception.InvalidBidException;
 import com.auction.exception.AuctionClosedException;
 
 public class AuctionManager {
-    // Sử dụng ConcurrentHashMap để nhiều luồng có thể truy cập các phiên đấu giá khác nhau cùng lúc
+    // Sử dụng ConcurrentHashMap để nhiều luồng có thể truy cập các phiên đấu giá
+    // khác nhau cùng lúc
     private Map<String, Item> activeAuctions;
 
     // Sử dụng CopyOnWriteArrayList để an toàn khi vừa duyệt vừa thêm/xóa Observer
@@ -96,7 +97,7 @@ public class AuctionManager {
     }
 
     // === CORE METHOD: Xử lý đấu giá ===
-    public boolean placeBid(String itemId, String bidderId, double bidAmount) 
+    public boolean placeBid(String itemId, String bidderId, double bidAmount)
             throws InvalidBidException, AuctionClosedException {
         return biddingService.placeBid(itemId, bidderId, bidAmount);
     }

@@ -12,11 +12,11 @@
 <VBox spacing="10" style="-fx-padding: 20;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.controller.auction.MyItemsController">
     <HBox alignment="CENTER_LEFT" spacing="15">
         <VBox>
-            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #0D3A26;" text="My Inventory" />
+            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #2c3e50;" text="My Inventory" />
             <Label style="-fx-text-fill: #7f8c8d; -fx-font-size: 11px;" text="Manage and track your auction items" />
         </VBox>
         <Region HBox.hgrow="ALWAYS" />
-        <Button onAction="#handleCreateItem" styleClass="btn-filled" style="-fx-background-color: #27ae60; -fx-padding: 8 20;" text="＋ Create New Item" />
+        <Button onAction="#handleCreateItem" styleClass="btn-filled" style="-fx-padding: 10 24;" text="＋ Create New Item" />
     </HBox>
     <TableView fx:id="itemTable" VBox.vgrow="ALWAYS">
         <columnResizePolicy>
