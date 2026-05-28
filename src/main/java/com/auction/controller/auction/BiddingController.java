@@ -44,7 +44,7 @@ public class BiddingController {
             try {
                 // Parse bid data from JSON
                 com.fasterxml.jackson.databind.JsonNode node = objectMapper.readTree(msg.getData());
-                double price = node.get("amount").asDouble();
+                double price = node.path("amount").asDouble(0);
                 
                 Platform.runLater(() -> {
                     long time = (System.currentTimeMillis() - startTime) / 1000;

@@ -22,7 +22,7 @@ public class BidAnalytics {
 
     public void recordBid(String itemId, double amount) {
         bidHistory.computeIfAbsent(itemId, k -> new CopyOnWriteArrayList<>()).add(amount);
-        bidCount.merge(itemId, 1, Integer::sum);
+        bidCount.merge(itemId, 1, Integer::sum); // tăng giá trị cho itemId lên 1
     }
 
     public void printStats(String itemId) {

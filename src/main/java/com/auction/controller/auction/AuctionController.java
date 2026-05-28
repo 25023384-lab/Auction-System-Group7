@@ -214,9 +214,9 @@ public class AuctionController {
 
                     case "BID_UPDATE": {
                         JsonNode node = objectMapper.readTree(msg.getData());
-                        String itemId = node.get("itemId").asText();
-                        double newAmount = node.get("amount").asDouble();
-                        String newBidderId = node.get("bidderId").asText();
+                        String itemId = node.path("itemId").asText();
+                        double newAmount = node.path("amount").asDouble();
+                        String newBidderId = node.path("bidderId").asText();
 
                         // Cập nhật trực tiếp vào list thay vì fetch lại toàn bộ (tránh mất selection)
                         for (Item it : itemTable.getItems()) {
@@ -228,9 +228,9 @@ public class AuctionController {
                         }
                         itemTable.refresh();
                         
-                        String itemName = node.has("itemName") ? node.get("itemName").asText() : "Unknown item";
-                        String bidderName = node.has("bidderName") ? node.get("bidderName").asText() : "Unknown";
-                        double amount = node.has("amount") ? node.get("amount").asDouble() : 0;
+                        String itemName = node.path("itemName").asText("Unknown item");
+                        String bidderName = node.path("bidderName").asText("Unknown");
+                        double amount = node.path("amount").asDouble(0);
 
                         String log = String.format("[BID] %s placed $%.2f on \"%s\"",
                                 bidderName, amount, itemName);
@@ -240,7 +240,7 @@ public class AuctionController {
                         // Cập nhật biểu đồ nếu item đang được chọn
                         Item selected = itemTable.getSelectionModel().getSelectedItem();
                         if (selected != null && node.has("itemId")
-                                && selected.getId().equals(node.get("itemId").asText())) {
+                                && selected.getId().equals(node.path("itemId").asText())) {
                             String timeLabel = LocalDateTime.now()
                                     .format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
                             priceSeries.getData().add(new XYChart.Data<>(timeLabel, amount));
@@ -266,8 +266,8 @@ public class AuctionController {
                     case "ANTI_SNIPING_TRIGGERED": {
                         fetchItemsFromServer();
                         JsonNode node = objectMapper.readTree(msg.getData());
-                        String itemId = node.get("itemId").asText();
-                        long rem = node.get("remainingSeconds").asLong();
+                        String itemId = node.path("itemId").asText();
+                        long rem = node.path("remainingSeconds").asLong();
                         String log = String.format("🛡️ [Anti-Sniping] Auction for \"%s\" extended! New time: %ds", itemId, rem);
                         addNotification(log);
                         if (adminDashboardController != null) adminDashboardController.addSystemLog(log);
@@ -403,13 +403,13 @@ public class AuctionController {
 
                     case "AUTO_BID_REGISTERED": {
                         JsonNode node = objectMapper.readTree(msg.getData());
-                        String itemId = node.get("itemId").asText();
-                        double max = node.get("maxBid").asDouble();
+                        String itemId = node.path("itemId").asText();
+                        double max = node.path("maxBid").asDouble();
                         String log = String.format("🤖 [AUTO-BID] Active for %s (Max: $%.2f)", itemId, max);
                         
                         if (autoBidStatusLabel != null) {
                             autoBidStatusLabel.setText(String.format("ACTIVE: Max $%.2f | Step $%.2f", 
-                                max, node.get("increment").asDouble()));
+                                max, node.path("increment").asDouble()));
                         }
                         
                         bidMessageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
@@ -421,7 +421,7 @@ public class AuctionController {
 
                     case "TOP_UP_SUCCESS": {
                         JsonNode node = objectMapper.readTree(msg.getData());
-                        double newBalance = node.get("newBalance").asDouble();
+                        double newBalance = node.path("newBalance").asDouble();
                         addNotification(String.format("[TOP-UP] Added funds successfully. New Balance: $%.2f", newBalance));
                         if (currentUser instanceof Bidder) {
                             ((Bidder) currentUser).setBalance(newBalance);

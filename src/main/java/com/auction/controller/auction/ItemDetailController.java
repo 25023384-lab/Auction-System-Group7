@@ -61,9 +61,9 @@ public class ItemDetailController {
             // Đọc item object
             Item item = mapper.treeToValue(root.get("item"), Item.class);
             this.currentItem = item;
-            String sellerName = root.has("sellerName") ? root.get("sellerName").asText() : "Unknown";
-            int bidCount = root.has("bidCount") ? root.get("bidCount").asInt() : 0;
-            String winnerName = root.has("winnerName") ? root.get("winnerName").asText() : "N/A";
+            String sellerName = root.path("sellerName").asText("Unknown");
+            int bidCount = root.path("bidCount").asInt(0);
+            String winnerName = root.path("winnerName").asText("N/A");
 
             // Cập nhật UI an toàn (null-check)
             if (itemNameLabel != null) itemNameLabel.setText(item.getName());
@@ -83,18 +83,18 @@ public class ItemDetailController {
             String type = item.getType();
             if ("ELECTRONICS".equals(type)) {
                 if (categoryLabel != null) categoryLabel.setText("Electronics");
-                if (extraInfoLabel != null && root.get("item").has("warrantyMonths")) {
-                    extraInfoLabel.setText("Warranty: " + root.get("item").get("warrantyMonths").asInt() + " months");
+                if (extraInfoLabel != null && !root.path("item").path("warrantyMonths").isMissingNode()) {
+                    extraInfoLabel.setText("Warranty: " + root.path("item").path("warrantyMonths").asInt() + " months");
                 }
             } else if ("ART".equals(type)) {
                 if (categoryLabel != null) categoryLabel.setText("Art");
-                if (extraInfoLabel != null && root.get("item").has("artistName")) {
-                    extraInfoLabel.setText("Artist: " + root.get("item").get("artistName").asText());
+                if (extraInfoLabel != null && !root.path("item").path("artistName").isMissingNode()) {
+                    extraInfoLabel.setText("Artist: " + root.path("item").path("artistName").asText());
                 }
             } else if ("VEHICLE".equals(type)) {
                 if (categoryLabel != null) categoryLabel.setText("Vehicle");
-                if (extraInfoLabel != null && root.get("item").has("engineCC")) {
-                    extraInfoLabel.setText("Engine: " + root.get("item").get("engineCC").asInt() + " cc");
+                if (extraInfoLabel != null && !root.path("item").path("engineCC").isMissingNode()) {
+                    extraInfoLabel.setText("Engine: " + root.path("item").path("engineCC").asInt() + " cc");
                 }
             } else {
                 if (categoryLabel != null) categoryLabel.setText("General");
