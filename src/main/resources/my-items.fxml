@@ -23,11 +23,11 @@
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
         </columnResizePolicy>
         <columns>
-            <TableColumn fx:id="nameColumn" minWidth="120" prefWidth="150" text="Name" />
-            <TableColumn fx:id="descColumn" minWidth="200" prefWidth="300" text="Description" />
-            <TableColumn fx:id="priceColumn" minWidth="100" prefWidth="100" text="Starting Price" />
-            <TableColumn fx:id="endTimeColumn" minWidth="150" prefWidth="150" text="End Time" />
-            <TableColumn fx:id="actionColumn" minWidth="180" prefWidth="180" text="Action" />
+            <TableColumn fx:id="nameColumn" minWidth="120" prefWidth="150" text="Name" reorderable="false" sortable="false"/>
+            <TableColumn fx:id="descColumn" minWidth="200" prefWidth="300" text="Description" reorderable="false" sortable="false"/>
+            <TableColumn fx:id="priceColumn" minWidth="100" prefWidth="100" text="Starting Price" reorderable="false" sortable="false"/>
+            <TableColumn fx:id="endTimeColumn" minWidth="150" prefWidth="150" text="End Time" reorderable="false" sortable="false"/>
+            <TableColumn fx:id="actionColumn" minWidth="180" prefWidth="180" text="Action" reorderable="false" sortable="false"/>
         </columns>
     </TableView>
 </VBox>

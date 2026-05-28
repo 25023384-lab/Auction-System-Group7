@@ -471,8 +471,13 @@ public class AuctionController {
                     topUpButton.setVisible(false);
                     topUpButton.setManaged(false);
                 }
-            }
-            if (userBalanceLabel != null && "BIDDER".equals(user.getRole())) {
+                if (userBalanceLabel != null) {
+                    userBalanceLabel.setVisible(false);
+                    userBalanceLabel.setManaged(false);
+                }
+            } else if (userBalanceLabel != null && "BIDDER".equals(user.getRole())) {
+                userBalanceLabel.setVisible(true);
+                userBalanceLabel.setManaged(true);
                 Bidder bidder = (Bidder) user;
                 userBalanceLabel.setText(String.format("Balance: $%.2f", bidder.getBalance()));
                 if (topUpButton != null) {

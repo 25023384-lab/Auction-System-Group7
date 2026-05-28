@@ -19,20 +19,13 @@
     
     <!-- SIDEBAR -->
     <left>
-        <VBox alignment="TOP_LEFT" prefWidth="230.0" spacing="4.0" 
-              style="-fx-background-color: white; -fx-padding: 24 14 24 14; -fx-border-color: #E2E8F0; -fx-border-width: 0 1 0 0;" BorderPane.alignment="CENTER">
+        <VBox alignment="TOP_LEFT" prefWidth="240.0" spacing="4.0" 
+              style="-fx-background-color: #2563EB; -fx-padding: 24 14 24 14;" BorderPane.alignment="CENTER">
             
-            <!-- Logo / Brand -->
-            <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 0 6 0 6;">
-                <Circle fill="#2563EB" radius="16.0" />
-                <Label style="-fx-font-size: 18px; -fx-text-fill: #0F172A; -fx-font-weight: 900;" text="AuctionHub" />
-                <padding>
-                    <Insets bottom="20.0" />
-                </padding>
-            </HBox>
+
 
             <!-- Section Header -->
-            <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #94A3B8; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 8 10 8 10;" text="MAIN MENU" />
+            <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #93C5FD; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 8 10 8 10;" text="MAIN MENU" />
 
             <!-- Navigation Buttons -->
             <Button fx:id="btnDashboard" alignment="BASELINE_LEFT" maxWidth="1.7976931348623157E308" 
@@ -60,13 +53,13 @@
             <VBox VBox.vgrow="ALWAYS" />
 
             <!-- Section Header for Account -->
-            <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #94A3B8; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 8 10 8 10;" text="ACCOUNT" />
+            <Label maxWidth="1.7976931348623157E308" style="-fx-text-fill: #93C5FD; -fx-font-size: 11px; -fx-font-weight: bold; -fx-padding: 8 10 8 10;" text="ACCOUNT" />
             
             <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-padding: 10 10;">
-                <Circle fill="#2563EB" radius="14.0" />
+                <Circle fill="white" radius="14.0" />
                 <VBox alignment="CENTER_LEFT">
-                    <Label fx:id="userNameLabel" style="-fx-text-fill: #0F172A; -fx-font-weight: bold; -fx-font-size: 13px;" text="Username" />
-                    <Label fx:id="userRoleLabel" style="-fx-text-fill: #94A3B8; -fx-font-size: 11px;" text="Role" />
+                    <Label fx:id="userNameLabel" style="-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13px;" text="Username" />
+                    <Label fx:id="userRoleLabel" style="-fx-text-fill: #DBEAFE; -fx-font-size: 11px;" text="Role" />
                 </VBox>
             </HBox>
 
@@ -82,8 +75,10 @@
     
     <!-- MAIN CONTENT AREA -->
     <center>
-        <StackPane fx:id="contentArea" style="-fx-background-color: #F1F5F9; -fx-padding: 0;">
-            <!-- Nội dung các màn hình (auction.fxml, my-items.fxml) sẽ được nhét vào đây -->
+        <StackPane style="-fx-background-color: #2563EB; -fx-padding: 10;">
+            <StackPane fx:id="contentArea" style="-fx-background-color: #F1F5F9; -fx-background-radius: 20; -fx-padding: 0;">
+                <!-- Nội dung các màn hình (auction.fxml, my-items.fxml) sẽ được nhét vào đây -->
+            </StackPane>
         </StackPane>
     </center>
 
