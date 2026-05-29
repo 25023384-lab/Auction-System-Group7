@@ -46,111 +46,123 @@ public class BiddingService {
         this.transactionHistory = transactionHistory;
     }
 
-    public boolean placeBid(String itemId, String bidderId, double bidAmount) 
+    public boolean placeBid(String itemId, String bidderId, double bidAmount)
             throws InvalidBidException, AuctionClosedException {
-        Item item = activeAuctions.get(itemId);
+        Item item = findActiveItem(itemId);
+        checkAntiSniping(itemId, item);
 
+        synchronized (item) {
+            Bidder bidder = resolveBidder(bidderId);
+            validateAndExecuteBid(item, bidder, itemId, bidAmount, bidderId);
+            return true;
+        }
+    }
+
+    /** Tìm item đang chạy trong activeAuctions; ném AuctionClosedException nếu không hợp lệ. */
+    private Item findActiveItem(String itemId) throws AuctionClosedException {
+        Item item = activeAuctions.get(itemId);
         if (item == null) {
             throw new AuctionClosedException("Item not found: " + itemId);
         }
-
         if (item.getStatus() != Item.Status.RUNNING) {
             throw new AuctionClosedException("Auction is not active (status: " + item.getStatus() + ").");
         }
+        return item;
+    }
 
-        // Đảm bảo AntiSniping đã biết về item này
+    /** Kiểm tra và gia hạn thời gian nếu bid xuất hiện trong 10 giây cuối (Anti-Sniping). */
+    private void checkAntiSniping(String itemId, Item item) throws AuctionClosedException {
         if (antiSniping.getRemainingSeconds(itemId) == -1) {
             antiSniping.syncItem(itemId, item.getEndTime());
         }
 
-        // Kiểm tra chống sniping và gia hạn nếu cần
         int snipingResult = antiSniping.checkAndExtend(itemId);
         if (snipingResult == -1) {
             throw new AuctionClosedException("Auction ended for \"" + item.getName() + "\"! Cannot bid.");
         } else if (snipingResult == 1) {
-            // Gia hạn thời gian kết thúc của item
             long rem = antiSniping.getRemainingSeconds(itemId);
             java.time.LocalDateTime newEnd = java.time.LocalDateTime.now().plusSeconds(rem);
             item.setEndTime(newEnd);
             try {
-                itemDAO.save(item); // Lưu cập nhật thời gian vào DB
-                // Gửi thông báo gia hạn cho các Client
+                itemDAO.save(item);
                 notificationService.notifyExtension(itemId, rem);
             } catch (SQLException ignored) {}
         }
+    }
 
-        synchronized (item) {
-            // Tìm bidder trong RAM trước, fallback xuống DB nếu không có
-            Bidder bidder = bidders.get(bidderId);
-            if (bidder == null) {
-                try {
-                    UserDAO.UserRecord rec = userDAO.findById(bidderId);
-                    if (rec != null && "BIDDER".equals(rec.role)) {
-                        bidder = new Bidder(rec.id, rec.username, rec.balance);
-                        bidders.put(bidderId, bidder); // cache vào RAM
-                    }
-                } catch (SQLException e) {
-                    System.out.println("DB lookup bidder failed: " + e.getMessage());
+    /** Tìm Bidder trong RAM; fallback xuống DB nếu chưa được cache. */
+    private Bidder resolveBidder(String bidderId) throws InvalidBidException {
+        Bidder bidder = bidders.get(bidderId);
+        if (bidder == null) {
+            try {
+                UserDAO.UserRecord rec = userDAO.findById(bidderId);
+                if (rec != null && "BIDDER".equals(rec.role)) {
+                    bidder = new Bidder(rec.id, rec.username, rec.balance);
+                    bidders.put(bidderId, bidder);
                 }
-            }
-            if (bidder == null) {
-                throw new InvalidBidException("Bidder not found: " + bidderId);
-            }
-
-            if (strategy.isValidBid(item.getCurrentHighestBid(), bidAmount)) {
-                boolean success = item.updateHighestBid(bidAmount, bidderId);
-                if (success) {
-                    System.out.println("Bid SUCCESS: " + bidderId + " -> $" + bidAmount + " on " + itemId);
-
-                    // Ghi analytics
-                    analyticsService.recordBid(itemId, bidAmount);
-
-                    // Gửi realtime notification
-                    notificationService.notifyRealtime(itemId, bidAmount, bidderId);
-
-                    // Trigger auto-bid
-                    if (autoBidder != null) {
-                        autoBidder.onNewBid(itemId, bidderId, bidAmount);
-                    }
-
-                    // 1. Mark bid cũ LOST trong DB trước
-                    bidDAO.markAllLost(itemId);
-
-                    // 2. Tạo transaction mới
-                    BidTransaction tx = new BidTransaction(itemId, bidderId, bidAmount);
-                    tx.markAsWinning();
-
-                    // 3. Lưu xuống DB
-                    try {
-                        bidDAO.saveBid(tx);
-                    } catch (Exception e) {
-                        System.out.println("DB save bid failed: " + e.getMessage());
-                    }
-
-
-                    // 4. Cập nhật giá item và bidder trong DB
-                    try {
-                        itemDAO.updateCurrentBid(itemId, bidAmount, bidderId);
-                    } catch (java.sql.SQLException e) {
-                        System.out.println("⚠️ DB update item failed: " + e.getMessage());
-                    }
-
-                    // 5. Lưu vào RAM như cũ
-                    markPreviousTransactionsAsLost(itemId);
-                    transactionHistory.add(tx);
-
-                    // Notify observers
-                    notificationService.notifyObservers(itemId, bidAmount, bidderId);
-
-                    return true;
-                } else {
-                    throw new InvalidBidException("Bid could not update highest bid. Amount too low or invalid.");
-                }
-            } else {
-                throw new InvalidBidException("Bid amount too low or invalid. Current highest bid: $" 
-                        + String.format("%.2f", item.getCurrentHighestBid()) + ", your bid: $" + String.format("%.2f", bidAmount));
+            } catch (SQLException e) {
+                System.out.println("DB lookup bidder failed: " + e.getMessage());
             }
         }
+        if (bidder == null) {
+            throw new InvalidBidException("Bidder not found: " + bidderId);
+        }
+        return bidder;
+    }
+
+    /** Lưu bid thành công vào DB (mark lost → save tx → update item price). */
+    private void saveBidToDatabase(String itemId, String bidderId, double bidAmount, BidTransaction tx) {
+        bidDAO.markAllLost(itemId);
+        try {
+            bidDAO.saveBid(tx);
+        } catch (Exception e) {
+            System.out.println("DB save bid failed: " + e.getMessage());
+        }
+        try {
+            itemDAO.updateCurrentBid(itemId, bidAmount, bidderId);
+        } catch (java.sql.SQLException e) {
+            System.out.println("⚠️ DB update item failed: " + e.getMessage());
+        }
+    }
+
+    /** Validate bid và thực thi toàn bộ logic sau khi bid thành công. */
+    private void validateAndExecuteBid(Item item, Bidder bidder, String itemId,
+                                       double bidAmount, String bidderId)
+            throws InvalidBidException {
+        if (!strategy.isValidBid(item.getCurrentHighestBid(), bidAmount)) {
+            throw new InvalidBidException("Bid amount too low or invalid. Current highest bid: $"
+                    + String.format("%.2f", item.getCurrentHighestBid())
+                    + ", your bid: $" + String.format("%.2f", bidAmount));
+        }
+
+        boolean success = item.updateHighestBid(bidAmount, bidderId);
+        if (!success) {
+            throw new InvalidBidException("Bid could not update highest bid. Amount too low or invalid.");
+        }
+
+        System.out.println("Bid SUCCESS: " + bidderId + " -> $" + bidAmount + " on " + itemId);
+
+        // Ghi analytics
+        analyticsService.recordBid(itemId, bidAmount);
+
+        // Trigger auto-bid
+        if (autoBidder != null) {
+            autoBidder.onNewBid(itemId, bidderId, bidAmount);
+        }
+
+        // Tạo transaction và lưu DB
+        BidTransaction tx = new BidTransaction(itemId, bidderId, bidAmount);
+        tx.markAsWinning();
+        saveBidToDatabase(itemId, bidderId, bidAmount, tx);
+
+        // Lưu vào lịch sử RAM
+        markPreviousTransactionsAsLost(itemId);
+        transactionHistory.add(tx);
+
+        // Notify observers (BidObserver pattern)
+        notificationService.notifyObservers(itemId, bidAmount, bidderId);
+        // NOTE: notifyRealtime() đã bị bỏ — BidHandler.handleBid() sẽ broadcast BID_UPDATE
+        //       với đầy đủ thông tin (có kèm bidderName), tránh client nhận 2 lần.
     }
 
     // Đánh dấu tất cả transaction cũ của item này là không thắng

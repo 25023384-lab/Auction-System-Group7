@@ -143,14 +143,14 @@ public class MainLayoutController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/admin-dashboard.fxml"));
             Parent adminView = loader.load();
             AdminDashboardController controller = loader.getController();
-            controller.setConnection(connection);
-            
-            contentArea.getChildren().setAll(adminView);
             
             if (auctionController != null) {
                 auctionController.setAdminDashboardController(controller);
             }
-        } catch (IOException e) {
+            
+            controller.setConnection(connection);
+            contentArea.getChildren().setAll(adminView);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

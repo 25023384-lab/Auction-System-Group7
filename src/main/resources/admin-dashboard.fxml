@@ -30,7 +30,7 @@
         </VBox>
         <VBox alignment="CENTER" HBox.hgrow="ALWAYS" styleClass="stats-card-mini" style="-fx-background-color: white; -fx-padding: 15; -fx-background-radius: 10;">
             <Label text="SYSTEM CASH" style="-fx-text-fill: #95a5a6; -fx-font-size: 11; -fx-font-weight: bold;" />
-            <Label fx:id="systemVolumeLabel" text="$0.00" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #2980b9;" />
+            <Label fx:id="systemVolumeLabel" text="\$0.00" style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #2980b9;" />
         </VBox>
     </HBox>
 
@@ -70,7 +70,7 @@
             <!-- SYSTEM LOGS -->
             <VBox spacing="10" prefHeight="180" style="-fx-background-color: #1E293B; -fx-padding: 15; -fx-background-radius: 15;">
                 <Label text="📜 Real-time System Audit" style="-fx-font-weight: bold; -fx-text-fill: #60A5FA; -fx-font-size: 14;" />
-                <ListView fx:id="systemLogList" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-control-inner-background: #1E293B; -fx-border-color: transparent;" stylesheets="admin-log-style.css"/>
+                <ListView fx:id="systemLogList" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-control-inner-background: #1E293B; -fx-border-color: transparent;" stylesheets="@admin-log-style.css"/>
             </VBox>
         </VBox>
     </HBox>
