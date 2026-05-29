@@ -2,8 +2,6 @@ package com.auction.controller.auth;
 
 import com.auction.controller.navigation.MainLayoutController;
 import com.auction.entity.user.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,8 +12,8 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 import com.auction.client.ClientConnection;
-import com.auction.entity.dto.auth.LoginRequest;
-import com.auction.entity.message.Message;
+import com.auction.client.api.AuthApiClient;
+import com.auction.client.api.AuctionApiClient;
 
 import java.io.IOException;
 
@@ -34,13 +32,12 @@ public class LoginController {
     private Button loginButton;
 
     private ClientConnection connection;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private AuthApiClient authApiClient;
 
     public LoginController() {
         try {
             connection = new ClientConnection();
-            // Đăng ký module để ObjectMapper có thể xử lý LocalDateTime
-            objectMapper.registerModule(new JavaTimeModule());
+            authApiClient = new AuthApiClient(connection);
         } catch (Exception e) {
             Platform.runLater(() -> messageLabel.setText("Error: Cannot connect to server."));
         }
@@ -70,33 +67,17 @@ public class LoginController {
         // Chạy login trong thread riêng để tránh treo UI
         new Thread(() -> {
             try {
-                LoginRequest req = new LoginRequest();
-                req.setUsername(username);
-                req.setPassword(password);
+                User loggedInUser = authApiClient.login(username, password);
                 
-                Message msg = new Message("LOGIN", objectMapper.writeValueAsString(req));
-                connection.sendMessage(msg);
-                
-                Message response = connection.receiveMessage();
-                
-                if ("LOGIN_SUCCESS".equals(response.getType())) {
-                    User loggedInUser = objectMapper.readValue(response.getData(), User.class);
-                    
-                    Platform.runLater(() -> {
-                        messageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
-                        messageLabel.setText("Login successful. Loading dashboard...");
-                        navigateToAuctionDashboard(loggedInUser);
-                    });
-                } else {
-                    Platform.runLater(() -> {
-                         messageLabel.setTextFill(javafx.scene.paint.Color.RED);
-                         messageLabel.setText("Login failed: " + response.getData());
-                    });
-                }
+                Platform.runLater(() -> {
+                    messageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
+                    messageLabel.setText("Login successful. Loading dashboard...");
+                    navigateToAuctionDashboard(loggedInUser);
+                });
             } catch (Exception e) {
                 Platform.runLater(() -> {
                      messageLabel.setTextFill(javafx.scene.paint.Color.RED);
-                     messageLabel.setText("Error: " + e.getMessage());
+                     messageLabel.setText("Login failed: " + e.getMessage());
                 });
             }
         }).start();
@@ -142,8 +123,7 @@ public class LoginController {
     private void fetchInitialItems() {
          new Thread(() -> {
              try {
-                Message req = new Message("GET_ITEMS", "");
-                connection.sendMessage(req);
+                new AuctionApiClient(connection).getItems();
                 // Phản hồi sẽ được AuctionController lắng nghe và xử lý tự động
             } catch (Exception e) {
                  System.err.println("Could not request initial items: " + e.getMessage());

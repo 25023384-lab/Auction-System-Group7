@@ -1,10 +1,10 @@
 package com.auction.controller.navigation;
 
 import com.auction.client.ClientConnection;
+import com.auction.client.api.AuctionApiClient;
 import com.auction.controller.admin.AdminDashboardController;
 import com.auction.controller.auction.AuctionController;
 import com.auction.controller.auction.MyItemsController;
-import com.auction.entity.message.Message;
 import com.auction.entity.user.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -24,6 +24,7 @@ public class MainLayoutController {
     @FXML private StackPane contentArea;
 
     private ClientConnection connection;
+    private AuctionApiClient apiClient;
     private User currentUser;
 
     private Parent dashboardView;
@@ -38,6 +39,7 @@ public class MainLayoutController {
 
     public void setConnectionAndUser(ClientConnection conn, User user) {
         this.connection = conn;
+        this.apiClient = new AuctionApiClient(conn);
         this.currentUser = user;
 
         userNameLabel.setText(user.getUsername());
@@ -92,8 +94,8 @@ public class MainLayoutController {
     @FXML
     private void handleLogout() {
         try {
-            if (connection != null) {
-                connection.sendMessage(new Message("LOGOUT", ""));
+            if (apiClient != null) {
+                apiClient.logout();
                 connection.close();
             }
             com.auction.client.AuctionClient.showLogin();
@@ -107,8 +109,7 @@ public class MainLayoutController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/auction.fxml"));
             dashboardView = loader.load();
             auctionController = loader.getController();
-            auctionController.setConnection(connection);
-            auctionController.setCurrentUser(currentUser);
+            auctionController.setConnectionAndUser(connection, currentUser);
             auctionController.setMainLayoutController(this);
             // auctionController.startMessageListener(); (now handled in setConnection)
             

@@ -3,7 +3,7 @@ package com.auction.service.notification;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import com.auction.entity.observer.BidObserver;
+import com.auction.event.BidObserver;
 import com.auction.entity.user.Bidder;
 import com.auction.service.realtime.RealtimeNotifier;
 

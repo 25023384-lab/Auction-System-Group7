@@ -1,6 +1,6 @@
 package com.auction.entity.user;
 
-import com.auction.entity.observer.BidObserver;
+import com.auction.event.BidObserver;
 
 public class Bidder extends User implements BidObserver {
     private double balance;

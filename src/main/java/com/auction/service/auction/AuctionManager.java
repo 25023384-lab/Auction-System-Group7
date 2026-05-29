@@ -6,7 +6,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.auction.entity.bid.BidTransaction;
 import com.auction.entity.items.Item;
-import com.auction.entity.observer.BidObserver;
+import com.auction.event.BidObserver;
 import com.auction.entity.user.Bidder;
 import com.auction.service.analytics.AnalyticsService;
 import com.auction.service.bidding.AutoBidder;

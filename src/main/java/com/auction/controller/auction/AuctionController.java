@@ -2,17 +2,13 @@ package com.auction.controller.auction;
 import com.auction.client.ClientConnection;
 import com.auction.controller.navigation.MainLayoutController;
 import com.auction.controller.admin.AdminDashboardController;
-import com.auction.entity.dto.bid.AutoBidRequest;
-import com.auction.entity.dto.bid.BidRequest;
+import com.auction.client.api.AuctionApiClient;
 import com.auction.entity.items.Item;
-import com.auction.entity.message.Message;
 import com.auction.entity.user.User;
 import com.auction.entity.user.Bidder;
 import com.auction.service.network.AuctionNetworkService;
 import com.auction.util.AuctionUIHelper;
 import com.auction.util.DialogManager;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -54,8 +50,8 @@ public class AuctionController {
     private ObservableList<Item> masterData = FXCollections.observableArrayList();
     private XYChart.Series<String, Number> priceSeries = new XYChart.Series<>();
     private ClientConnection connection;
+    private AuctionApiClient apiClient;
     private User currentUser;
-    private final ObjectMapper objectMapper = new ObjectMapper();
     private final ScheduledExecutorService timerExecutor = Executors.newSingleThreadScheduledExecutor();
     private MainLayoutController mainLayoutController;
     private AdminDashboardController adminDashboardController;
@@ -66,7 +62,6 @@ public class AuctionController {
     public AdminDashboardController getAdminDashboardController() { return adminDashboardController; }
     public User getCurrentUser() { return currentUser; }
     public AuctionController() {
-        objectMapper.registerModule(new JavaTimeModule());
     }
     @FXML
     public void initialize() {
@@ -99,8 +94,10 @@ public class AuctionController {
                 () -> Platform.runLater(() -> itemTable.refresh()),
                 1, 1, TimeUnit.SECONDS);
     }
-    public void setConnection(ClientConnection connection) {
+    public void setConnectionAndUser(ClientConnection connection, User user) {
         this.connection = connection;
+        this.apiClient = new AuctionApiClient(connection);
+        this.currentUser = user;
         this.networkService = new AuctionNetworkService(connection, this);
         this.networkService.startListening();
     }
@@ -141,12 +138,10 @@ public class AuctionController {
         itemTable.setItems(filtered);
     }
     public void fetchItemsFromServer() {
-        try { connection.sendMessage(new Message("GET_ITEMS", "")); }
-        catch (Exception e) { System.err.println("Could not request items: " + e.getMessage()); }
+        apiClient.getItems();
     }
-    public void fetchBidHistory(String itemId) {
-        try { connection.sendMessage(new Message("GET_BID_HISTORY", itemId)); }
-        catch (Exception e) { e.printStackTrace(); }
+    private void fetchBidHistory(String itemId) {
+        apiClient.getBidHistory(itemId);
     }
     public void updateBidHistoryList(List<Map<String, Object>> bids) {
         Platform.runLater(() -> {
@@ -187,11 +182,7 @@ public class AuctionController {
         }
         try {
             double amount = Double.parseDouble(amountText);
-            BidRequest req = new BidRequest();
-            req.setItemId(selectedItem.getId());
-            req.setBidderId(currentUser.getId());
-            req.setAmount(amount);
-            connection.sendMessage(new Message("BID", objectMapper.writeValueAsString(req)));
+            apiClient.placeBid(selectedItem.getId(), currentUser.getId(), amount);
             bidMessageLabel.setTextFill(javafx.scene.paint.Color.GRAY);
             bidMessageLabel.setText("Sending bid...");
         } catch (NumberFormatException e) {
@@ -224,8 +215,7 @@ public class AuctionController {
                 showBidResult(false, "Max bid must be higher than current price.");
                 return;
             }
-            AutoBidRequest req = new AutoBidRequest(selectedItem.getId(), currentUser.getId(), maxBid, increment);
-            connection.sendMessage(new Message("REGISTER_AUTO_BID", objectMapper.writeValueAsString(req)));
+            apiClient.registerAutoBid(selectedItem.getId(), currentUser.getId(), maxBid, increment);
             bidMessageLabel.setTextFill(javafx.scene.paint.Color.GRAY);
             bidMessageLabel.setText("Registering auto-bid...");
         } catch (NumberFormatException e) {
@@ -241,14 +231,13 @@ public class AuctionController {
             showBidResult(false, "Please select an item to view details.");
             return;
         }
-        try { connection.sendMessage(new Message("GET_ITEM_DETAILS", selectedItem.getId())); }
-        catch (Exception e) { e.printStackTrace(); }
+        apiClient.getItemDetails(selectedItem.getId());
     }
     @FXML
     private void handleLogout() {
         try {
             if (connection != null) {
-                connection.sendMessage(new Message("LOGOUT", ""));
+                apiClient.logout();
                 connection.close();
             }
             timerExecutor.shutdown();
@@ -259,14 +248,12 @@ public class AuctionController {
     }
     @FXML
     private void handleShowMyItems() {
-        try { connection.sendMessage(new Message("GET_SELLER_ITEMS", currentUser.getId())); }
-        catch (Exception e) { e.printStackTrace(); }
+        apiClient.getSellerItems(currentUser.getId());
     }
     @FXML
     private void handleTopUp() {
         DialogManager.handleTopUp(connection, currentUser, this::addNotification);
     }
-    // Callbacks from Network Service
     public void updateItemBid(String itemId, double newAmount, String newBidderId, String itemName, String bidderName, double amount) {
         for (Item it : itemTable.getItems()) {
             if (it.getId().equals(itemId)) {
@@ -315,8 +302,7 @@ public class AuctionController {
                     changedItem.getName(), winner != null ? winner : "No bids", changedItem.getCurrentHighestBid());
 
             if (currentUser != null && currentUser.getId().equals(winner)) {
-                try { connection.sendMessage(new Message("GET_ITEM_DETAILS", changedItem.getId())); }
-                catch (Exception ignored) {}
+                apiClient.getItemDetails(changedItem.getId());
             }
         } else {
             notif = String.format("[STATUS] \"%s\" is now %s", changedItem.getName(), changedItem.getStatus());

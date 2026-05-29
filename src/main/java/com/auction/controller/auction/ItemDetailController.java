@@ -10,8 +10,8 @@ import javafx.stage.Stage;
 
 import java.time.format.DateTimeFormatter;
 import com.auction.client.ClientConnection;
+import com.auction.client.api.AuctionApiClient;
 import com.auction.entity.user.User;
-import com.auction.entity.message.Message;
 import javafx.scene.control.Button;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -38,6 +38,7 @@ public class ItemDetailController {
     @FXML private Button btnCancelOrder;
 
     private ClientConnection connection;
+    private AuctionApiClient apiClient;
     private User currentUser;
     private Item currentItem;
 
@@ -48,6 +49,7 @@ public class ItemDetailController {
 
     public void setConnectionAndUser(ClientConnection connection, User user) {
         this.connection = connection;
+        this.apiClient = new AuctionApiClient(connection);
         this.currentUser = user;
     }
 
@@ -139,12 +141,8 @@ public class ItemDetailController {
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                try {
-                    connection.sendMessage(new Message("PAY_ITEM", currentItem.getId()));
-                    handleClose();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                apiClient.payItem(currentItem.getId());
+                handleClose();
             }
         });
     }
@@ -160,12 +158,8 @@ public class ItemDetailController {
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK) {
-                try {
-                    connection.sendMessage(new Message("CANCEL_ORDER", currentItem.getId()));
-                    handleClose();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                apiClient.cancelOrder(currentItem.getId());
+                handleClose();
             }
         });
     }

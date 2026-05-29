@@ -1,6 +1,7 @@
 package com.auction.service.network;
 
 import com.auction.client.ClientConnection;
+import com.auction.client.api.AuctionApiClient;
 import com.auction.controller.auction.AuctionController;
 import com.auction.entity.items.Item;
 import com.auction.entity.message.Message;
@@ -19,11 +20,13 @@ import java.util.Map;
 public class AuctionNetworkService {
 
     private final ClientConnection connection;
+    private final AuctionApiClient apiClient;
     private final AuctionController controller;
     private final ObjectMapper objectMapper;
 
     public AuctionNetworkService(ClientConnection connection, AuctionController controller) {
         this.connection = connection;
+        this.apiClient = new AuctionApiClient(connection);
         this.controller = controller;
         this.objectMapper = new ObjectMapper();
         this.objectMapper.registerModule(new JavaTimeModule());
@@ -114,7 +117,7 @@ public class AuctionNetworkService {
                         List<Item> items = objectMapper.readValue(msg.getData(), new TypeReference<>() {});
                         controller.loadItems(FXCollections.observableArrayList(items));
                         if (controller.getAdminDashboardController() != null) {
-                            controller.getAdminDashboardController().loadItems(msg.getData());
+                            controller.getAdminDashboardController().loadItems(items);
                         }
                         break;
                     }
@@ -135,14 +138,16 @@ public class AuctionNetworkService {
                         if (controller.getMainLayoutController() != null && controller.getMainLayoutController().getMyItemsController() != null) {
                             controller.getMainLayoutController().getMyItemsController().fetchMyItems();
                         }
-                        try { connection.sendMessage(new Message("GET_ITEMS", "")); } catch (Exception ignored) {}
+                        apiClient.getItems();
                         break;
 
-                    case "ALL_USERS":
+                    case "ALL_USERS": {
+                        List<com.auction.dao.UserDAO.UserRecord> users = objectMapper.readValue(msg.getData(), new TypeReference<>() {});
                         if (controller.getAdminDashboardController() != null) {
-                            controller.getAdminDashboardController().loadUsers(msg.getData());
+                            controller.getAdminDashboardController().loadUsers(users);
                         }
                         break;
+                    }
 
                     case "DELETE_USER_SUCCESS":
                         controller.addNotification("[ADMIN] Deleted user successfully: " + msg.getData());

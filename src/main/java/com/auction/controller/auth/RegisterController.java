@@ -1,9 +1,7 @@
 package com.auction.controller.auth;
 
 import com.auction.client.ClientConnection;
-import com.auction.entity.message.Message;
-import com.auction.entity.dto.auth.RegisterRequest;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.auction.client.api.AuthApiClient;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -40,11 +38,12 @@ public class RegisterController {
 
     private final ToggleGroup roleToggleGroup = new ToggleGroup();
     private ClientConnection connection;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private AuthApiClient authApiClient;
 
     public RegisterController() {
         try {
             connection = new ClientConnection();
+            authApiClient = new AuthApiClient(connection);
         } catch (Exception e) {
             Platform.runLater(() -> messageLabel.setText("Cannot connect to server."));
         }
@@ -107,30 +106,17 @@ public class RegisterController {
         String email = username + "@example.com";
 
         try {
-            RegisterRequest req = new RegisterRequest();
-            req.setUsername(username);
-            req.setPassword(password);
-            req.setEmail(email);
-            req.setRole(role);
+            authApiClient.register(username, email, password, role);
 
-            Message msg = new Message("REGISTER", objectMapper.writeValueAsString(req));
-            connection.sendMessage(msg);
-
-            Message response = connection.receiveMessage();
-
-            if ("REGISTER_SUCCESS".equals(response.getType())) {
-                Platform.runLater(() -> {
-                    messageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
-                    messageLabel.setText("Registration successful! You can now login.");
-                });
-            } else {
-                Platform.runLater(() -> {
-                    messageLabel.setTextFill(javafx.scene.paint.Color.RED);
-                    messageLabel.setText(response.getData());
-                });
-            }
+            Platform.runLater(() -> {
+                messageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
+                messageLabel.setText("Registration successful! You can now login.");
+            });
         } catch (Exception e) {
-            Platform.runLater(() -> messageLabel.setText("Error: " + e.getMessage()));
+            Platform.runLater(() -> {
+                messageLabel.setTextFill(javafx.scene.paint.Color.RED);
+                messageLabel.setText(e.getMessage());
+            });
         }
     }
 

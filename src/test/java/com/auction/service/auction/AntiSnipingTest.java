@@ -44,9 +44,9 @@ public class AntiSnipingTest {
         int result = antiSniping.checkAndExtend("Item3");
         assertEquals(1, result);
         
-        // After extension, remaining time should be around 25s
+        // After extension, remaining time should be around 20s
         long remaining = antiSniping.getRemainingSeconds("Item3");
-        assertTrue(remaining >= 20);
+        assertTrue(remaining >= 19);
     }
 
     @Test

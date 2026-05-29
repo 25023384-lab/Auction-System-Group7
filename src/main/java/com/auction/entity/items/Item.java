@@ -1,6 +1,6 @@
 package com.auction.entity.items;
 
-import com.auction.entity.observer.AuctionObserver;
+
 import com.auction.entity.Entity;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -9,8 +9,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @JsonTypeInfo(
     use = JsonTypeInfo.Id.NAME,
@@ -47,7 +45,7 @@ public abstract class Item extends Entity {
     private String type; 
     private String sellerId; 
 
-    private transient List<AuctionObserver> observers = new ArrayList<>();
+
 
     public Item() {
         super(null);
@@ -97,16 +95,11 @@ public abstract class Item extends Entity {
     public String getSellerId() { return sellerId; }
     public void setSellerId(String sellerId) { this.sellerId = sellerId; }
 
-    public void addObserver(AuctionObserver observer) {
-        if (observers == null) observers = new ArrayList<>();
-        observers.add(observer);
-    }
 
     public boolean updateHighestBid(double amount, String bidderId) {
         if (amount > currentHighestBid) {
             this.currentHighestBid = amount;
             this.highestBidderId = bidderId;
-            notifyObservers("New highest bid for " + name + ": $" + amount + " by " + bidderId);
             return true;
         }
         return false;
@@ -114,13 +107,7 @@ public abstract class Item extends Entity {
 
     public abstract void printInfo();
 
-    protected void notifyObservers(String message) {
-        if (observers != null) {
-            for (AuctionObserver obs : observers) {
-                obs.update(message);
-            }
-        }
-    }
+
 
     @Override
     public String toString() {

@@ -1,14 +1,13 @@
 package com.auction.controller.auction;
 
 import com.auction.client.ClientConnection;
+import com.auction.client.api.AuctionApiClient;
 import com.auction.entity.items.Electronics;
 import com.auction.entity.items.Item;
-import com.auction.entity.message.Message;
 import com.auction.entity.items.Art;
 import com.auction.entity.items.Vehicle;
 import com.auction.entity.user.User;
-import com.auction.service.factory.ItemFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.auction.entity.factory.ItemFactory;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -57,15 +56,16 @@ public class CreateItemController {
     private Label messageLabel;
 
     private ClientConnection connection;
+    private AuctionApiClient apiClient;
     private User currentSeller;
     private Item editingItem;
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
     public CreateItemController() {
     }
 
     public void setConnection(ClientConnection connection) {
         this.connection = connection;
+        this.apiClient = new AuctionApiClient(connection);
     }
 
     public void setCurrentSeller(User currentSeller) {
@@ -217,10 +217,7 @@ public class CreateItemController {
 
             if (newItem == null) return;
 
-            // Đóng gói đối tượng Item thành JSON
-            String itemJson = objectMapper.writeValueAsString(newItem);
-            String messageType = (editingItem != null) ? "UPDATE_ITEM" : "CREATE_ITEM";
-            Message msg = new Message(messageType, itemJson);
+            final Item finalNewItem = newItem;
 
             Platform.runLater(() -> {
                 messageLabel.setTextFill(javafx.scene.paint.Color.BLUE);
@@ -229,7 +226,11 @@ public class CreateItemController {
 
             Thread sendThread = new Thread(() -> {
                 try {
-                    connection.sendMessage(msg);
+                    if (editingItem != null) {
+                        apiClient.updateItem(finalNewItem);
+                    } else {
+                        apiClient.createItem(finalNewItem);
+                    }
                     Platform.runLater(() -> {
                         messageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
                         messageLabel.setText("Success!");

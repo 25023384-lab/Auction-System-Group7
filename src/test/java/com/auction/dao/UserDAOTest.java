@@ -9,6 +9,11 @@ import java.util.List;
 public class UserDAOTest {
     private UserDAO userDAO;
 
+    @org.junit.jupiter.api.BeforeAll
+    static void initDB() {
+        com.auction.util.DBHelper.initializeDatabase();
+    }
+
     @BeforeEach
     void setUp() {
         userDAO = new UserDAO();
@@ -19,19 +24,19 @@ public class UserDAOTest {
         String uniqueId = "testDAO_" + System.currentTimeMillis();
 
         // Save
-        userDAO.insert(uniqueId, "daoUser", "dao@email.com", "hashPass", "BIDDER", 0.0);
+        userDAO.insert(uniqueId, "daoUser_" + uniqueId, uniqueId + "@email.com", "hashPass", "BIDDER", 0.0);
 
         // Find
         UserDAO.UserRecord record = userDAO.findById(uniqueId);
         assertNotNull(record);
-        assertEquals("daoUser", record.username);
+        assertEquals("daoUser_" + uniqueId, record.username);
         assertEquals("BIDDER", record.role);
     }
 
     @Test
     void testUpdateBalance() throws Exception {
         String uniqueId = "testDAO_bal_" + System.currentTimeMillis();
-        userDAO.insert(uniqueId, "daoUserBal", "bal@email.com", "hashPass", "BIDDER", 0.0);
+        userDAO.insert(uniqueId, "daoUserBal_" + uniqueId, uniqueId + "@email.com", "hashPass", "BIDDER", 0.0);
 
         userDAO.updateBalance(uniqueId, 1500.50);
 
@@ -43,7 +48,7 @@ public class UserDAOTest {
     @Test
     void testFindByRole() throws Exception {
         String uniqueId = "testDAO_role_" + System.currentTimeMillis();
-        userDAO.insert(uniqueId, "daoUserRole", "role@email.com", "hashPass", "ADMIN", 0.0);
+        userDAO.insert(uniqueId, "daoUserRole_" + uniqueId, uniqueId + "@email.com", "hashPass", "ADMIN", 0.0);
 
         List<UserDAO.UserRecord> list = userDAO.findByRole("ADMIN");
         assertNotNull(list);

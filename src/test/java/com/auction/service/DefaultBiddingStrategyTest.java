@@ -18,7 +18,7 @@ public class DefaultBiddingStrategyTest {
     @Test
     public void testValidBid_NewBidIsHigher() {
         // Kịch bản: Giá mới (150) cao hơn giá hiện tại (100) -> Hợp lệ
-        boolean result = strategy.isValidBid(150.0, 100.0);
+        boolean result = strategy.isValidBid(100.0, 150.0);
         assertTrue(result, "Giá 150 phải hợp lệ khi giá hiện tại là 100");
     }
 
@@ -32,7 +32,7 @@ public class DefaultBiddingStrategyTest {
     @Test
     public void testInvalidBid_NewBidIsLower() {
         // Kịch bản: Giá mới thấp hơn giá hiện tại -> Không hợp lệ
-        boolean result = strategy.isValidBid(90.0, 100.0);
+        boolean result = strategy.isValidBid(100.0, 90.0);
         assertFalse(result, "Giá thầu thấp hơn giá hiện tại không được phép hợp lệ");
     }
 }

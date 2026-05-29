@@ -11,6 +11,11 @@ import com.auction.exception.AuthenticationException;
 public class AuthServiceTest {
     private AuthService authService;
 
+    @org.junit.jupiter.api.BeforeAll
+    static void initDB() {
+        com.auction.util.DBHelper.initializeDatabase();
+    }
+
     @BeforeEach
     void setUp() {
         authService = new AuthService();
@@ -19,14 +24,14 @@ public class AuthServiceTest {
     @Test
     void testRegisterUser() {
         String uniqueUser = "testuser_" + System.currentTimeMillis();
-        boolean result = authService.register(uniqueUser, "test@email.com", "password", "BIDDER");
+        boolean result = authService.register(uniqueUser, uniqueUser + "@email.com", "password", "BIDDER");
         assertTrue(result);
     }
 
     @Test
     void testLoginUser() throws Exception {
         String uniqueUser = "loginuser_" + System.currentTimeMillis();
-        authService.register(uniqueUser, "test@email.com", "password", "BIDDER");
+        authService.register(uniqueUser, uniqueUser + "@email.com", "password", "BIDDER");
         User result = authService.login(uniqueUser, "password");
         assertNotNull(result);
         assertEquals(uniqueUser, result.getUsername());
@@ -35,7 +40,7 @@ public class AuthServiceTest {
     @Test
     void testLoginIncorrectPasswordThrowsException() {
         String uniqueUser = "loginwrongpw_" + System.currentTimeMillis();
-        authService.register(uniqueUser, "test@email.com", "password", "BIDDER");
+        authService.register(uniqueUser, uniqueUser + "@email.com", "password", "BIDDER");
         
         assertThrows(AuthenticationException.class, () -> {
             authService.login(uniqueUser, "wrongpassword");

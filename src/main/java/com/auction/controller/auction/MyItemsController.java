@@ -1,8 +1,8 @@
 package com.auction.controller.auction;
 
 import com.auction.client.ClientConnection;
+import com.auction.client.api.AuctionApiClient;
 import com.auction.entity.items.Item;
-import com.auction.entity.message.Message;
 import com.auction.entity.user.User;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -30,6 +30,7 @@ public class MyItemsController {
     @FXML private TableColumn<Item, Void> actionColumn;
 
     private ClientConnection connection;
+    private AuctionApiClient apiClient;
     private User currentUser;
 
     @FXML
@@ -75,16 +76,13 @@ public class MyItemsController {
 
     public void setConnectionAndUser(ClientConnection connection, User user) {
         this.connection = connection;
+        this.apiClient = new AuctionApiClient(connection);
         this.currentUser = user;
     }
 
     public void fetchMyItems() {
-        if (connection != null && currentUser != null) {
-            try {
-                connection.sendMessage(new Message("GET_SELLER_ITEMS", currentUser.getId()));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (apiClient != null && currentUser != null) {
+            apiClient.getSellerItems(currentUser.getId());
         }
     }
 
@@ -109,11 +107,7 @@ public class MyItemsController {
 
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.OK || response == ButtonType.YES) {
-                try {
-                    connection.sendMessage(new Message("DELETE_ITEM", item.getId()));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                apiClient.deleteItem(item.getId());
             }
         });
     }

@@ -1,11 +1,10 @@
 package com.auction.util;
 
 import com.auction.client.ClientConnection;
+import com.auction.client.api.AuctionApiClient;
 import com.auction.controller.auction.CreateItemController;
 import com.auction.controller.auction.ItemDetailController;
-import com.auction.entity.message.Message;
 import com.auction.entity.user.User;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,14 +16,10 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
 public class DialogManager {
-
-    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     public static void showInfo(String title, String content) {
         Platform.runLater(() -> {
@@ -146,10 +141,7 @@ public class DialogManager {
             try {
                 double amount = Double.parseDouble(amountStr);
                 if (amount > 0) {
-                    Map<String, Object> req = new HashMap<>();
-                    req.put("userId", currentUser.getId());
-                    req.put("amount", amount);
-                    connection.sendMessage(new Message("TOP_UP", objectMapper.writeValueAsString(req)));
+                    new AuctionApiClient(connection).topUp(currentUser.getId(), amount);
                 } else {
                     if (onNotification != null) onNotification.accept("[ERROR] Top-up amount must be positive.");
                 }

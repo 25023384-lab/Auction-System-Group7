@@ -1,12 +1,9 @@
 package com.auction.controller.admin;
 
 import com.auction.client.ClientConnection;
+import com.auction.client.api.AuctionApiClient;
 import com.auction.dao.UserDAO;
 import com.auction.entity.items.Item;
-import com.auction.entity.message.Message;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -36,8 +33,7 @@ public class AdminDashboardController {
     @FXML private Label systemVolumeLabel;
     @FXML private TextField userSearchField;
 
-    private ClientConnection connection;
-    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    private AuctionApiClient apiClient;
     private List<UserDAO.UserRecord> allUsers = new java.util.ArrayList<>();
 
     @FXML
@@ -85,23 +81,20 @@ public class AdminDashboardController {
     }
 
     public void setConnection(ClientConnection connection) {
-        this.connection = connection;
+        this.apiClient = new AuctionApiClient(connection);
         handleRefreshAll();
     }
 
     @FXML
     public void handleRefreshAll() {
-        if (connection != null) {
-            try {
-                connection.sendMessage(new Message("GET_ALL_USERS", ""));
-                connection.sendMessage(new Message("GET_ITEMS", ""));
-            } catch (Exception e) { e.printStackTrace(); }
+        if (apiClient != null) {
+            apiClient.getAllUsers();
+            apiClient.getItems();
         }
     }
 
-    public void loadUsers(String usersJson) {
+    public void loadUsers(List<UserDAO.UserRecord> users) {
         try {
-            List<UserDAO.UserRecord> users = objectMapper.readValue(usersJson, new TypeReference<List<UserDAO.UserRecord>>() {});
             this.allUsers = users;
             Platform.runLater(() -> {
                 userTable.setItems(FXCollections.observableArrayList(users));
@@ -112,9 +105,8 @@ public class AdminDashboardController {
         } catch (Exception e) { e.printStackTrace(); }
     }
 
-    public void loadItems(String itemsJson) {
+    public void loadItems(List<Item> items) {
         try {
-            List<Item> items = objectMapper.readValue(itemsJson, new TypeReference<List<Item>>() {});
             Platform.runLater(() -> {
                 itemTable.setItems(FXCollections.observableArrayList(items));
                 activeItemsLabel.setText(String.valueOf(items.size()));
@@ -146,7 +138,7 @@ public class AdminDashboardController {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Ban/Delete " + user.username + "?", ButtonType.YES, ButtonType.NO);
         alert.showAndWait().ifPresent(response -> {
             if (response == ButtonType.YES) {
-                try { connection.sendMessage(new Message("DELETE_USER", user.id)); } catch (Exception e) { e.printStackTrace(); }
+                apiClient.deleteUser(user.id);
             }
         });
     }
