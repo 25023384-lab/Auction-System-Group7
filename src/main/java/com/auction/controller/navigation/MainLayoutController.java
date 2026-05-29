@@ -53,12 +53,9 @@ public class MainLayoutController {
         if ("ADMIN".equals(user.getRole())) {
             btnAdminPanel.setVisible(true);
             btnAdminPanel.setManaged(true);
-        }
-
-        loadDashboard();
-        
-        if ("ADMIN".equals(user.getRole())) {
-            showAdminPanel(); // Đè giao diện lên trên
+            showAdminPanel(); 
+        } else {
+            loadDashboard();
         }
     }
 
@@ -111,7 +108,6 @@ public class MainLayoutController {
             auctionController = loader.getController();
             auctionController.setConnectionAndUser(connection, currentUser);
             auctionController.setMainLayoutController(this);
-            // auctionController.startMessageListener(); (now handled in setConnection)
             
             contentArea.getChildren().setAll(dashboardView);
         } catch (IOException e) {
@@ -135,6 +131,15 @@ public class MainLayoutController {
 
     private void loadAdminPanel() {
         try {
+            if (auctionController == null) {
+                // Load the dashboard first to initialize the auctionController
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/auction.fxml"));
+                dashboardView = loader.load();
+                auctionController = loader.getController();
+                auctionController.setConnectionAndUser(connection, currentUser);
+                auctionController.setMainLayoutController(this);
+            }
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/admin-dashboard.fxml"));
             Parent adminView = loader.load();
             AdminDashboardController controller = loader.getController();
@@ -142,7 +147,6 @@ public class MainLayoutController {
             
             contentArea.getChildren().setAll(adminView);
             
-            // Pass the controller back to AuctionController to listen for incoming messages
             if (auctionController != null) {
                 auctionController.setAdminDashboardController(controller);
             }

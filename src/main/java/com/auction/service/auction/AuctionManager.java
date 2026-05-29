@@ -19,20 +19,12 @@ import com.auction.exception.InvalidBidException;
 import com.auction.exception.AuctionClosedException;
 
 public class AuctionManager {
-    // Sử dụng ConcurrentHashMap để nhiều luồng có thể truy cập các phiên đấu giá
-    // khác nhau cùng lúc
     private Map<String, Item> activeAuctions;
-
-    // Sử dụng CopyOnWriteArrayList để an toàn khi vừa duyệt vừa thêm/xóa Observer
     private BiddingStrategy strategy;
-
-    // === Các component mới ===
     private AntiSniping antiSniping;
     private List<BidTransaction> transactionHistory;
     private AutoBidder autoBidder;
     private Map<String, Bidder> bidders;
-
-    // Services
     private NotificationService notificationService;
     private AnalyticsService analyticsService;
     private BiddingService biddingService;
@@ -40,22 +32,18 @@ public class AuctionManager {
     public AuctionManager() {
         activeAuctions = new ConcurrentHashMap<>();
         strategy = new DefaultBiddingStrategy();
-
-        // Khởi tạo các component mới
         antiSniping = AntiSniping.getInstance();
         transactionHistory = new CopyOnWriteArrayList<>();
         bidders = new ConcurrentHashMap<>();
-
-        // Initialize services
         notificationService = new NotificationService();
         analyticsService = new AnalyticsService();
+        autoBidder = new AutoBidder(this);
         biddingService = new BiddingService(activeAuctions, bidders, strategy, antiSniping,
                 analyticsService, notificationService, autoBidder, transactionHistory);
     }
 
     public void setAutoBidder(AutoBidder autoBidder) {
         this.autoBidder = autoBidder;
-        // Update biddingService if needed, but for simplicity, assume set before use
         biddingService = new BiddingService(activeAuctions, bidders, strategy, antiSniping,
                 analyticsService, notificationService, autoBidder, transactionHistory);
     }
@@ -80,12 +68,16 @@ public class AuctionManager {
         return activeAuctions.get(itemId);
     }
 
-    // === Advanced: Đăng ký theo dõi item realtime ===
+    public void updateItemStatus(Item item) {
+        if (activeAuctions.containsKey(item.getId())) {
+            activeAuctions.put(item.getId(), item);
+        }
+    }
+
     public void watchItem(String itemId, Bidder bidder) {
         notificationService.watchItem(itemId, bidder);
     }
 
-    // === Advanced: Bắt đầu đếm ngược ===
     public void startCountdown(String itemId, int seconds) {
         notificationService.startCountdown(itemId, seconds, () -> {
             System.out.println("🏆 AUCTION CLOSED for " + itemId);
@@ -96,33 +88,27 @@ public class AuctionManager {
         });
     }
 
-    // === CORE METHOD: Xử lý đấu giá ===
     public boolean placeBid(String itemId, String bidderId, double bidAmount)
             throws InvalidBidException, AuctionClosedException {
         return biddingService.placeBid(itemId, bidderId, bidAmount);
     }
 
-    // === Advanced: Thống kê ===
     public void showAnalytics(String itemId) {
         analyticsService.printStats(itemId);
     }
 
-    // === Advanced: Lấy thời gian còn lại ===
     public long getRemainingTime(String itemId) {
         return antiSniping.getRemainingSeconds(itemId);
     }
 
-    // === Advanced: Xem lịch sử giao dịch ===
     public void printTransactionHistory(String itemId) {
         biddingService.printTransactionHistory(itemId);
     }
 
-    // === Advanced: Xem tất cả lịch sử ===
     public void printAllTransactions() {
         biddingService.printAllTransactions();
     }
 
-    // === Helper: Kiểm tra item còn đấu giá không ===
     public boolean isAuctionActive(String itemId) {
         return antiSniping.isAuctionActive(itemId);
     }

@@ -97,9 +97,9 @@ public class AuctionController {
     public void setConnectionAndUser(ClientConnection connection, User user) {
         this.connection = connection;
         this.apiClient = new AuctionApiClient(connection);
-        this.currentUser = user;
         this.networkService = new AuctionNetworkService(connection, this);
         this.networkService.startListening();
+        setCurrentUser(user);
     }
     public void setCurrentUser(User user) {
         this.currentUser = user;
@@ -262,6 +262,7 @@ public class AuctionController {
                 break;
             }
         }
+
         itemTable.refresh();
         String log = String.format("[BID] %s placed $%.2f on \"%s\"", bidderName, amount, itemName);
         addNotification(log);

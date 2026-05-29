@@ -10,7 +10,7 @@
     <HBox alignment="CENTER_LEFT" spacing="20">
         <VBox>
             <Label text="Admin Panel" style="-fx-font-size: 26; -fx-font-weight: 900; -fx-text-fill: #0F172A;" />
-            <Label text="System-wide Monitoring & Control" style="-fx-text-fill: #94A3B8; -fx-font-size: 13;" />
+            <Label text="System-wide Monitoring &amp; Control" style="-fx-text-fill: #94A3B8; -fx-font-size: 13;" />
         </VBox>
         <Region HBox.hgrow="ALWAYS" />
         <HBox spacing="10">
@@ -70,7 +70,7 @@
             <!-- SYSTEM LOGS -->
             <VBox spacing="10" prefHeight="180" style="-fx-background-color: #1E293B; -fx-padding: 15; -fx-background-radius: 15;">
                 <Label text="📜 Real-time System Audit" style="-fx-font-weight: bold; -fx-text-fill: #60A5FA; -fx-font-size: 14;" />
-                <ListView fx:id="systemLogList" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-control-inner-background: #1E293B; -fx-border-color: transparent;" stylesheets="@admin-log-style.css"/>
+                <ListView fx:id="systemLogList" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-control-inner-background: #1E293B; -fx-border-color: transparent;" stylesheets="admin-log-style.css"/>
             </VBox>
         </VBox>
     </HBox>

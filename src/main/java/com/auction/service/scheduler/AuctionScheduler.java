@@ -26,10 +26,21 @@ public class AuctionScheduler {
     }
 
     public void start() {
+        // Load all items into the auction manager on startup
+        try {
+            List<Item> allItems = itemDAO.findAll();
+            for (Item item : allItems) {
+                auctionManager.addItem(item);
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading initial items: " + e.getMessage());
+        }
+
         scheduler.scheduleAtFixedRate(this::checkAuctions, 0, 5, TimeUnit.SECONDS);
     }
 
     private void checkAuctions() {
+        System.out.println("Checking auctions...");
         try {
             List<Item> allItems = itemDAO.findAll();
             LocalDateTime now = LocalDateTime.now();
@@ -38,7 +49,7 @@ public class AuctionScheduler {
                 boolean changed = false;
 
                 // 1. Chuyển OPEN -> RUNNING
-                if (item.getStatus() == Item.Status.OPEN && now.isAfter(item.getStartTime())) {
+                if (item.getStatus() == Item.Status.OPEN && !now.isBefore(item.getStartTime())) {
                     item.setStatus(Item.Status.RUNNING);
                     changed = true;
                     System.out.println("🚀 Auction STARTED: " + item.getName());
@@ -48,7 +59,7 @@ public class AuctionScheduler {
                 if (item.getStatus() == Item.Status.RUNNING && now.isAfter(item.getEndTime())) {
                     item.setStatus(Item.Status.FINISHED);
                     changed = true;
-                    System.out.println("🏁 Auction FINISHED: " + item.getName() + 
+                    System.out.println("🏁 Auction FINISHED: " + item.getName() +
                                        " | Winner: " + item.getHighestBidderId());
                 }
 
@@ -56,7 +67,7 @@ public class AuctionScheduler {
                     // Cập nhật Database
                     itemDAO.save(item);
                     // Cập nhật Memory Manager
-                    auctionManager.addItem(item);
+                    auctionManager.updateItemStatus(item);
                     // Broadcast cho Client
                     AuctionServer.broadcast(new Message("ITEM_STATUS_CHANGED", objectMapper.writeValueAsString(item)));
                 }
