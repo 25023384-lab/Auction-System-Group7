@@ -1,53 +1,126 @@
-# Auction-System-Group7
-# Bài tập lớn: Hệ thống đấu giá - Nhóm 7
-## Thành viên
-1. Lê Công Xuân Phúc - 25023358 (Nhóm trưởng)
-2. Hồ Anh Tuấn - 25023384
-3. Nguyễn Anh Tùng - 25023389
-4. Trần Thanh Nhật - 25023348
+# Hệ thống Đấu giá Trực tuyến (Auction System)
 
+## 1. Mô tả bài toán và Phạm vi hệ thống
 
-Refactor : Chuẩn hóa OOP, chuyển tất cả thuộc tính từ Protected sang Privated để đảm bảo tính đóng gói, đồng thời fixed lỗi Sigleton cho class AuctionManager ( Thêm các hàm getter,setter) on 4/6/2026 at 6:20 AM
-## Hướng dẫn chạy:
-Hệ thống Đấu giá Real-time bằng JavaFX
-Đây là một ứng dụng đấu giá desktop được xây dựng bằng Java, JavaFX, Maven và SQLite, cho phép nhiều người dùng tham gia vào các phiên đấu giá trong thời gian thực.
-Tính năng chính
-•Giao diện người dùng được xây dựng bằng JavaFX và FXML.
-•Giao tiếp Client-Server qua socket TCP/IP.
-•Quản lý cơ sở dữ liệu với SQLite và JDBC.
-•Tối ưu hiệu năng database với Connection Pool (HikariCP).
-•Mã hóa mật khẩu an toàn bằng BCrypt.
-•Tải dữ liệu hiệu quả với chức năng Phân trang (Pagination).
-•Hỗ trợ đấu giá tự động (Auto-bidding).
-Yêu cầu hệ thống
-Để cài đặt và chạy dự án, bạn cần đảm bảo đã cài đặt các phần mềm sau:
-•Java Development Kit (JDK): Phiên bản 11 trở lên.(các thành viên đang sử dụng jdk 25)
-•Apache Maven: Để quản lý thư viện và xây dựng dự án.
-•Git: Để sao chép mã nguồn từ repository.
-Hướng dẫn Cài đặt & Chạy
-1. Tải mã nguồn
-Mở terminal (hoặc Command Prompt/PowerShell trên Windows) và chạy lệnh sau để sao chép dự án về máy của bạn:
-Shell Script
-git clone <URL_REPOSITORY_GITHUB_CUA_BAN>
-cd Auction-System-Group7
-2. Xây dựng dự án
-Sử dụng Maven để tự động tải các thư viện cần thiết (như JavaFX, HikariCP, jBCrypt,...) và biên dịch mã nguồn.
-Shell Script
-mvn clean install
-Lệnh này sẽ tạo một file .jar thực thi trong thư mục target. File này sẽ có tên tương tự như Auction-System-Group7-1.0-SNAPSHOT.jar.
-3. Chạy chương trình
-Ứng dụng bao gồm hai thành phần: Server (máy chủ) và Client (máy khách). Bạn phải chạy Server trước, sau đó mới chạy các Client.
-Bước 3.1: Chạy Server
-Mở một cửa sổ terminal, di chuyển đến thư mục gốc của dự án và chạy lệnh sau:
-Shell Script
-java -jar target/Auction-System-Group7-1.0-SNAPSHOT.jar server
-Lưu ý: Tên file .jar có thể khác một chút tùy theo cấu hình trong file pom.xml của bạn. Hãy kiểm tra tên chính xác trong thư mục target sau khi xây dựng dự án.
-Khi bạn thấy thông báo như Server is listening on port [số port], có nghĩa là máy chủ đã sẵn sàng và đang chờ các máy khách kết nối. Hãy giữ cửa sổ terminal này mở.
-Bước 3.2: Chạy Client
-Mỗi người dùng sẽ sử dụng một ứng dụng Client để đăng nhập và tham gia đấu giá.
-Mở một cửa sổ terminal mới (không đóng cửa sổ của server) và chạy lệnh sau:
-Shell Script
-java -jar target/Auction-System-Group7-1.0-SNAPSHOT.jar
-Ngay sau đó, cửa sổ đăng nhập của ứng dụng sẽ hiện lên.
-Bạn có thể mở nhiều cửa sổ terminal và chạy lệnh này nhiều lần để giả lập nhiều người dùng khác nhau cùng tham gia vào hệ thống đấu giá.
+Dự án xây dựng một hệ thống đấu giá trực tuyến client-server, cho phép người dùng tham gia vào các phiên đấu giá vật phẩm trong thời gian thực.
 
+**Phạm vi hệ thống:**
+- **Người dùng:** Hệ thống hỗ trợ 3 vai trò chính: Người bán (Seller), Người đấu giá (Bidder), và Quản trị viên (Admin).
+- **Vật phẩm:** Người bán có thể đăng bán các vật phẩm với giá khởi điểm và thời gian đấu giá cụ thể.
+- **Đấu giá:** Người đấu giá có thể xem danh sách vật phẩm, theo dõi và đặt giá. Hệ thống tự động cập nhật giá cao nhất và thông báo cho những người dùng khác.
+- **Kiến trúc:** Hệ thống được xây dựng theo mô hình Client-Server, sử dụng giao thức TCP/IP để giao tiếp. Server chịu trách nhiệm xử lý toàn bộ logic nghiệp vụ và quản lý trạng thái, trong khi Client cung cấp giao diện đồ họa cho người dùng tương tác.
+
+---
+
+## 2. Công nghệ sử dụng và Yêu cầu cài đặt
+
+### Công nghệ
+
+- **Ngôn ngữ lập trình:** Java 11+
+- **Giao diện người dùng (GUI):** JavaFX
+- **Cơ sở dữ liệu:** SQLite
+- **Giao tiếp mạng:** Java Sockets (TCP)
+- **Xử lý JSON:** Jackson Databind
+- **Mã hóa mật khẩu:** jBCrypt
+- **Build tool:** Maven
+
+### Môi trường chạy và Cài đặt
+
+1.  **JDK (Java Development Kit):** Yêu cầu cài đặt JDK phiên bản 11 trở lên.
+2.  **Maven:** Yêu cầu cài đặt Apache Maven để build dự án.
+3.  **IDE (Tùy chọn):** IntelliJ IDEA hoặc Eclipse để phát triển và chạy ứng dụng từ mã nguồn.
+
+---
+
+## 3. Cấu trúc thư mục và Module chính
+
+Dự án được tổ chức theo các package có trách nhiệm rõ ràng:
+
+```
+src/main/java/com/auction/
+├── app/                # Chứa lớp Main, điểm khởi đầu của ứng dụng.
+├── client/             # Các lớp liên quan đến phía Client (GUI Controllers, networking).
+├── server/             # Các lớp liên quan đến phía Server (AuctionServer, ClientHandler).
+├── dao/                # Data Access Objects - Các lớp giao tiếp trực tiếp với CSDL.
+├── entity/             # Các lớp thực thể (POJO) như User, Item, BidTransaction.
+├── exception/          # Các lớp ngoại lệ tùy chỉnh của ứng dụng.
+├── service/            # Lõi nghiệp vụ của hệ thống.
+│   ├── auction/        # Quản lý phiên đấu giá, chống sniping.
+│   ├── auth/           # Xử lý đăng nhập, đăng ký.
+│   ├── bidding/        # Xử lý logic đặt giá, auto-bid, phân tích.
+│   ├── factory/        # Factory Pattern để tạo các loại Item.
+│   ├── notification/   # Dịch vụ thông báo (Observer Pattern).
+│   ├── realtime/       # Xử lý các tác vụ thời gian thực, đếm ngược.
+│   └── scheduler/      # Tự động bắt đầu/kết thúc phiên đấu giá.
+└── resources/
+    ├── fxml/           # Các file FXML định nghĩa giao diện.
+    └── auction.db      # File cơ sở dữ liệu SQLite.
+```
+
+---
+
+## 4. Vị trí file .jar
+
+Sau khi build dự án bằng Maven, file `.jar` thực thi sẽ nằm tại thư mục:
+
+`target/Auction-System-Group7-pi-1.0-SNAPSHOT.jar`
+
+*(Lưu ý: Tên file có thể thay đổi tùy theo phiên bản trong file `pom.xml`)*
+
+---
+
+## 5. Hướng dẫn chạy Server/Client
+
+**Quan trọng:** Luôn luôn phải khởi động **Server trước** khi khởi động Client.
+
+### Bước 1: Build dự án
+
+Mở Terminal hoặc Command Prompt tại thư mục gốc của dự án và chạy lệnh sau để build file `.jar`:
+
+```bash
+mvn clean package
+```
+
+### Bước 2: Chạy Server
+
+Trong Terminal, chạy lệnh sau:
+
+```bash
+java -jar target/Auction-System-Group7-pi-1.0-SNAPSHOT.jar server
+```
+
+Khi Server khởi động thành công, bạn sẽ thấy thông báo tương tự như: `Server is listening on port 12345`.
+
+### Bước 3: Chạy Client
+
+Mở một hoặc nhiều cửa sổ Terminal mới và chạy lệnh sau để khởi động mỗi Client:
+
+```bash
+java -jar target/Auction-System-Group7-pi-1.0-SNAPSHOT.jar
+```
+
+Mỗi lệnh sẽ mở một cửa sổ giao diện đăng nhập của ứng dụng.
+
+---
+
+## 6. Danh sách chức năng đã hoàn thành
+
+- [x] **Quản lý người dùng:** Đăng nhập, Đăng ký với 3 vai trò (Bidder, Seller, Admin).
+- [x] **Bảo mật:** Mật khẩu người dùng được mã hóa an toàn bằng BCrypt.
+- [x] **Quản lý vật phẩm:** Seller có thể đăng bán vật phẩm với đầy đủ thông tin (giá, thời gian, mô tả).
+- [x] **Đấu giá thời gian thực:** Bidder có thể đặt giá, giá cao nhất được cập nhật ngay lập tức cho tất cả người dùng đang xem.
+- [x] **Tự động hóa phiên đấu giá:** Hệ thống tự động chuyển trạng thái vật phẩm từ `Sắp diễn ra` -> `Đang diễn ra` -> `Đã kết thúc` dựa trên thời gian đã lên lịch.
+- [x] **Tính năng nâng cao:**
+    - [x] **Chống "Sniping":** Tự động gia hạn thời gian đấu giá nếu có người đặt giá vào những giây cuối cùng.
+    - [x] **Đấu giá tự động (Proxy Bidding):** Người dùng có thể thiết lập một mức giá tối đa, hệ thống sẽ tự động đặt giá giúp họ một cách thông minh.
+    - [x] **Phân tích dữ liệu:** Cung cấp các số liệu thống kê cơ bản về một phiên đấu giá (tổng số lượt, giá trung bình, v.v.).
+    - [x] **Hệ thống thông báo:** Người dùng có thể "theo dõi" vật phẩm để nhận thông báo.
+
+---
+
+## 7. Link báo cáo và Video Demo
+
+- **Báo cáo PDF:** `[Link đến file báo cáo của bạn]`
+- **Video Demo:** `[Link đến video trên YouTube, Google Drive, v.v.]`
+
+---
