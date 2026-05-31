@@ -26,7 +26,6 @@ public class BiddingService {
     private AntiSniping antiSniping;
     private AnalyticsService analyticsService;
     private NotificationService notificationService;
-    private AutoBidder autoBidder;
     private List<BidTransaction> transactionHistory;
     private BidTransactionDAO bidDAO = new BidTransactionDAO();
     private ItemDAO itemDAO = new ItemDAO();
@@ -42,7 +41,6 @@ public class BiddingService {
         this.antiSniping = antiSniping;
         this.analyticsService = analyticsService;
         this.notificationService = notificationService;
-        this.autoBidder = autoBidder;
         this.transactionHistory = transactionHistory;
     }
 
@@ -58,7 +56,6 @@ public class BiddingService {
         }
     }
 
-    /** Tìm item đang chạy trong activeAuctions; ném AuctionClosedException nếu không hợp lệ. */
     private Item findActiveItem(String itemId) throws AuctionClosedException {
         Item item = activeAuctions.get(itemId);
         if (item == null) {
@@ -70,7 +67,6 @@ public class BiddingService {
         return item;
     }
 
-    /** Kiểm tra và gia hạn thời gian nếu bid xuất hiện trong 10 giây cuối (Anti-Sniping). */
     private void checkAntiSniping(String itemId, Item item) throws AuctionClosedException {
         if (antiSniping.getRemainingSeconds(itemId) == -1) {
             antiSniping.syncItem(itemId, item.getEndTime());
@@ -90,7 +86,6 @@ public class BiddingService {
         }
     }
 
-    /** Tìm Bidder trong RAM; fallback xuống DB nếu chưa được cache. */
     private Bidder resolveBidder(String bidderId) throws InvalidBidException {
         Bidder bidder = bidders.get(bidderId);
         if (bidder == null) {
@@ -110,7 +105,6 @@ public class BiddingService {
         return bidder;
     }
 
-    /** Lưu bid thành công vào DB (mark lost → save tx → update item price). */
     private void saveBidToDatabase(String itemId, String bidderId, double bidAmount, BidTransaction tx) {
         bidDAO.markAllLost(itemId);
         try {
@@ -125,7 +119,6 @@ public class BiddingService {
         }
     }
 
-    /** Validate bid và thực thi toàn bộ logic sau khi bid thành công. */
     private void validateAndExecuteBid(Item item, Bidder bidder, String itemId,
                                        double bidAmount, String bidderId)
             throws InvalidBidException {
@@ -142,34 +135,22 @@ public class BiddingService {
 
         System.out.println("Bid SUCCESS: " + bidderId + " -> $" + bidAmount + " on " + itemId);
 
-        // Ghi analytics
         analyticsService.recordBid(itemId, bidAmount);
 
-        // Trigger auto-bid
-        if (autoBidder != null) {
-            autoBidder.onNewBid(itemId, bidderId, bidAmount);
-        }
-
-        // Tạo transaction và lưu DB
         BidTransaction tx = new BidTransaction(itemId, bidderId, bidAmount);
         tx.markAsWinning();
         saveBidToDatabase(itemId, bidderId, bidAmount, tx);
 
-        // Lưu vào lịch sử RAM
         markPreviousTransactionsAsLost(itemId);
         transactionHistory.add(tx);
 
-        // Notify observers (BidObserver pattern)
         notificationService.notifyObservers(itemId, bidAmount, bidderId);
-        // NOTE: notifyRealtime() đã bị bỏ — BidHandler.handleBid() sẽ broadcast BID_UPDATE
-        //       với đầy đủ thông tin (có kèm bidderName), tránh client nhận 2 lần.
     }
 
-    // Đánh dấu tất cả transaction cũ của item này là không thắng
     private void markPreviousTransactionsAsLost(String itemId) {
         for (BidTransaction tx : transactionHistory) {
             if (tx.getItemId().equals(itemId) && tx.isWinning()) {
-                tx.markAsLost();  // Cần thêm method này trong BidTransaction
+                tx.markAsLost();
             }
         }
     }

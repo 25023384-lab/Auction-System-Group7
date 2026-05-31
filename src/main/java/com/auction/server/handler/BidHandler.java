@@ -19,9 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-/**
- * Xử lý các yêu cầu liên quan đến Bid: Đặt giá, Auto-Bid, Lịch sử, Analytics.
- */
 public class BidHandler {
     private final AuctionManager auctionManager;
     private final AutoBidder autoBidder;
@@ -42,38 +39,52 @@ public class BidHandler {
         try {
             BidRequest req = objectMapper.readValue(msg.getData(), BidRequest.class);
             boolean success = auctionManager.placeBid(req.getItemId(), req.getBidderId(), req.getAmount());
-            out.println(objectMapper.writeValueAsString(
-                    new Message("BID_RESULT", String.valueOf(success))));
-            if (success) {
-                // Lấy tên item để hiển thị trong notification
-                Item item = auctionManager.getItem(req.getItemId());
-                String itemName = (item != null) ? item.getName() : req.getItemId();
-                // Lấy username của bidder để hiển thị
-                String bidderName = req.getBidderId();
-                try {
-                    UserDAO.UserRecord rec = userDAO.findById(req.getBidderId());
-                    if (rec != null) bidderName = rec.username;
-                } catch (Exception ignored) {}
 
-                // Tạo notification JSON chi tiết hơn
-                Map<String, Object> bidUpdate = new HashMap<>();
-                bidUpdate.put("itemId", req.getItemId());
-                bidUpdate.put("itemName", itemName);
-                bidUpdate.put("amount", req.getAmount());
-                bidUpdate.put("bidderId", req.getBidderId());
-                bidUpdate.put("bidderName", bidderName);
-                broadcast.accept(new Message("BID_UPDATE", objectMapper.writeValueAsString(bidUpdate)));
+            if (success) {
+                // After the initial bid, immediately trigger the auto-bidder.
+                autoBidder.onNewBid(req.getItemId(), req.getBidderId(), req.getAmount());
+
+                // Now that the entire chain is complete, get the final state.
+                Item finalItemState = auctionManager.getItem(req.getItemId());
+                if (finalItemState != null) {
+                    broadcastBidUpdate(
+                        finalItemState.getId(),
+                        finalItemState.getCurrentHighestBid(),
+                        finalItemState.getHighestBidderId(),
+                        broadcast
+                    );
+                }
             }
+            // Send the result back to the original bidder *after* all processing.
+            out.println(objectMapper.writeValueAsString(new Message("BID_RESULT", String.valueOf(success))));
+
         } catch (InvalidBidException | AuctionClosedException e) {
             try {
-                out.println(objectMapper.writeValueAsString(
-                        new Message("BID_RESULT", e.getMessage())));
+                out.println(objectMapper.writeValueAsString(new Message("BID_RESULT", e.getMessage())));
             } catch (Exception ignored) {}
         } catch (Exception e) {
             try {
                 out.println(objectMapper.writeValueAsString(new Message("ERROR", e.getMessage())));
             } catch (Exception ignored) {}
         }
+    }
+
+    private void broadcastBidUpdate(String itemId, double amount, String bidderId, Consumer<Message> broadcast) throws Exception {
+        Item item = auctionManager.getItem(itemId);
+        String itemName = (item != null) ? item.getName() : itemId;
+        String bidderName = bidderId;
+        try {
+            UserDAO.UserRecord rec = userDAO.findById(bidderId);
+            if (rec != null) bidderName = rec.username;
+        } catch (Exception ignored) {}
+
+        Map<String, Object> bidUpdate = new HashMap<>();
+        bidUpdate.put("itemId", itemId);
+        bidUpdate.put("itemName", itemName);
+        bidUpdate.put("amount", amount);
+        bidUpdate.put("bidderId", bidderId);
+        bidUpdate.put("bidderName", bidderName);
+        broadcast.accept(new Message("BID_UPDATE", objectMapper.writeValueAsString(bidUpdate)));
     }
 
     public void handleRegisterAutoBid(Message msg, PrintWriter out) {
@@ -87,9 +98,6 @@ public class BidHandler {
             resp.put("increment", req.getIncrement());
             out.println(objectMapper.writeValueAsString(
                     new Message("AUTO_BID_REGISTERED", objectMapper.writeValueAsString(resp))));
-            System.out.println("AutoBid registered: bidder=" + req.getBidderId()
-                    + " item=" + req.getItemId()
-                    + " max=$" + req.getMaxBid() + " step=$" + req.getIncrement());
         } catch (Exception e) {
             try { out.println(objectMapper.writeValueAsString(new Message("ERROR", e.getMessage()))); }
             catch (Exception ignored) {}
@@ -101,7 +109,6 @@ public class BidHandler {
             String itemId = msg.getData();
             List<BidTransaction> bids = bidDAO.getBidsByItem(itemId);
 
-            // Tạo list có kèm username
             List<Map<String, Object>> richBids = new java.util.ArrayList<>();
             for (BidTransaction bid : bids) {
                 Map<String, Object> entry = new HashMap<>();
@@ -110,7 +117,6 @@ public class BidHandler {
                 entry.put("status", bid.getStatus());
                 entry.put("timestamp", bid.getTimestamp() != null
                         ? bid.getTimestamp().toString() : "");
-                // Resolve username
                 String username = bid.getBidderId();
                 try {
                     UserDAO.UserRecord rec = userDAO.findById(bid.getBidderId());

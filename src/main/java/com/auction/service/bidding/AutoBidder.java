@@ -2,6 +2,7 @@ package com.auction.service.bidding;
 
 import com.auction.service.auction.AuctionManager;
 
+
 import java.util.*;
 import java.util.concurrent.*;
 
@@ -67,6 +68,17 @@ public class AutoBidder {
             if (nextBid <= cfg.maxBid) {
                 System.out.println("      -> Decision: Next bid is within the max limit. Placing bid...");
                 try {
+                    // This call is recursive: an auto-bid triggers onNewBid again.
+                    boolean ok = manager.placeBid(itemId, cfg.bidderId, nextBid);
+                    if (ok) {
+                        System.out.println("      -> SUCCESS: Auto-bid placed for " + cfg.bidderId + ". Breaking loop for this round.");
+                        // Once a successful auto-bid is placed, we stop for this round.
+                        // The new bid will trigger this whole process again if needed.
+                        break; 
+                    }
+                } catch (Exception e) {
+                    System.err.println("      -> FAILED: Auto-bid for " + cfg.bidderId + " failed: " + e.getMessage());
+                }                try {
                     // This call is recursive: an auto-bid triggers onNewBid again.
                     boolean ok = manager.placeBid(itemId, cfg.bidderId, nextBid);
                     if (ok) {
