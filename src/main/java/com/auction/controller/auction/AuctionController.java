@@ -272,21 +272,6 @@ public class AuctionController {
             String timeLabel = LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss"));
             priceSeries.getData().add(new XYChart.Data<>(timeLabel, amount));
             fetchBidHistory(selected.getId());
-
-            // Cập nhật nhãn bidMessageLabel sinh động real-time
-            if (currentUser != null) {
-                if (currentUser.getId().equals(newBidderId)) {
-                    if (bidMessageLabel != null) {
-                        bidMessageLabel.setTextFill(javafx.scene.paint.Color.GREEN);
-                        bidMessageLabel.setText(String.format("You are the highest bidder! ($%.2f)", newAmount));
-                    }
-                } else {
-                    if (bidMessageLabel != null) {
-                        bidMessageLabel.setTextFill(javafx.scene.paint.Color.ORANGE);
-                        bidMessageLabel.setText(String.format("New bid by %s: $%.2f", bidderName, newAmount));
-                    }
-                }
-            }
         }
     }
     public void showBidResult(boolean success, String message) {

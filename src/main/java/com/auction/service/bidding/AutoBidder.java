@@ -1,7 +1,6 @@
 package com.auction.service.bidding;
 
 import com.auction.service.auction.AuctionManager;
-import com.auction.entity.items.Item;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -31,38 +30,15 @@ public class AutoBidder {
         this.manager = manager;
     }
 
-    public void register(
+    public synchronized void register(
             String bidderId, String itemId,
             double maxBid, double increment) {
 
-        synchronized (this) {
-            configs.computeIfAbsent(itemId, k -> new CopyOnWriteArrayList<>())
-                    .add(new AutoConfig(bidderId, maxBid, increment));
-        }
+        configs.computeIfAbsent(itemId, k -> new CopyOnWriteArrayList<>())
+                .add(new AutoConfig(bidderId, maxBid, increment));
 
         System.out.println("🤖 [AutoBid-Register] User " + bidderId
                 + " registered for item " + itemId + " with max bid $" + maxBid + " and increment $" + increment);
-
-        // Tự động kích hoạt thầu lượt đầu tiên nếu chưa dẫn đầu
-        if (manager != null) {
-            Item item = manager.getItem(itemId);
-            if (item != null) {
-                double currentPrice = item.getCurrentHighestBid();
-                String currentWinner = item.getHighestBidderId();
-
-                if (!bidderId.equals(currentWinner)) {
-                    double nextBid = currentPrice + increment;
-                    if (nextBid <= maxBid) {
-                        System.out.println("🤖 [AutoBid-FirstTrigger] User " + bidderId + " is not the highest bidder. Triggering first auto-bid of $" + nextBid);
-                        try {
-                            manager.placeBid(itemId, bidderId, nextBid);
-                        } catch (Exception e) {
-                            System.err.println("🤖 [AutoBid-FirstTrigger] Failed to place first bid: " + e.getMessage());
-                        }
-                    }
-                }
-            }
-        }
     }
 
     public void onNewBid(String itemId, String winnerBidderId, double currentPrice) {
