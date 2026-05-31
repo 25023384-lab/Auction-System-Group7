@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Slide Thuyết trình Hệ thống Đấu giá - Nhóm 7</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @page {
+            size: 297mm 167mm;
+            margin: 0;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #0b091a;
+            color: #ffffff;
+            line-height: 1.5;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* ===== SLIDE SETUP (16:9 Landscape) ===== */
+        .slide {
+            width: 297mm;
+            height: 167mm;
+            margin: 0 auto;
+            padding: 10mm 15mm 12mm 15mm;
+            page-break-after: always;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #09071a 0%, #151138 50%, #0d0a21 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .slide:last-child {
+            page-break-after: avoid;
+        }
+
+        /* Ambient Glow Effects */
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: -40%;
+            right: -20%;
+            width: 350mm;
+            height: 350mm;
+            background: radial-gradient(circle, rgba(108, 99, 255, 0.12) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .slide::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 250mm;
+            height: 250mm;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Headers & Footers */
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 3mm;
+            margin-bottom: 4mm;
+            z-index: 1;
+            position: relative;
+        }
+
+        .slide-title {
+            font-size: 18pt;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, #fff 0%, #a8b5ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-title-addon {
+            font-size: 9pt;
+            color: #6c63ff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: rgba(108, 99, 255, 0.15);
+            padding: 1mm 3mm;
+            border-radius: 4px;
+            border: 1px solid rgba(108, 99, 255, 0.25);
+        }
+
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding-top: 2.5mm;
+            font-size: 8pt;
+            color: rgba(255, 255, 255, 0.4);
+            z-index: 1;
+            position: relative;
+        }
+
+        .slide-footer .team-name {
+            font-weight: 600;
+            color: #a8b5ff;
+        }
+
+        .slide-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            z-index: 1;
+            position: relative;
+        }
+
+        /* Grid layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6mm;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5mm;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4mm;
+        }
+
+        /* Glassmorphism Cards */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 5mm 6mm;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .glass-card h3 {
+            font-size: 13pt;
+            font-weight: 700;
+            color: #a8b5ff;
+            margin-bottom: 3mm;
+            display: flex;
+            align-items: center;
+            gap: 2mm;
+        }
+
+        .glass-card p {
+            font-size: 9.5pt;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.6;
+        }
+
+        /* Lists */
+        ul {
+            list-style: none;
+        }
+
+        ul li {
+            font-size: 9.5pt;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 2mm;
+            position: relative;
+            padding-left: 5mm;
+            line-height: 1.5;
+        }
+
+        ul li::before {
+            content: '✦';
+            position: absolute;
+            left: 0;
+            color: #ff6b6b;
+            font-size: 8pt;
+        }
+
+        ul.green-bullet li::before {
+            color: #2ecc71;
+        }
+
+        ul.blue-bullet li::before {
+            color: #3498db;
+        }
+
+        /* Highlighting and Badges */
+        .highlight-text {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .badge-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2mm;
+            margin-top: 3mm;
+        }
+
+        .tech-badge {
+            background: rgba(108, 99, 255, 0.15);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            color: #d1d5ff;
+            font-size: 8pt;
+            font-weight: 600;
+            padding: 1mm 3mm;
+            border-radius: 12px;
+        }
+
+        /* Architecture Diagram Styles */
+        .arch-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5mm;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 10px;
+            padding: 3mm;
+        }
+
+        .arch-layer {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 2.2mm 4mm;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+
+        .arch-layer-title {
+            width: 25%;
+            font-size: 8.5pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #a8b5ff;
+            border-right: 2px solid rgba(255, 255, 255, 0.1);
+            padding-right: 3mm;
+            display: flex;
+            align-items: center;
+            gap: 1.5mm;
+        }
+
+        .arch-layer-boxes {
+            width: 75%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5mm;
+            padding-left: 4mm;
+        }
+
+        .arch-box {
+            background: rgba(108, 99, 255, 0.15);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            color: #e0e3ff;
+            font-size: 7.5pt;
+            font-weight: 600;
+            padding: 0.8mm 2.2mm;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        .arch-box.green-theme { background: rgba(46, 204, 113, 0.15); border-color: rgba(46, 204, 113, 0.3); color: #e2fbe8; }
+        .arch-box.orange-theme { background: rgba(230, 126, 34, 0.15); border-color: rgba(230, 126, 34, 0.3); color: #fdf2e9; }
+        .arch-box.red-theme { background: rgba(231, 76, 60, 0.15); border-color: rgba(231, 76, 60, 0.3); color: #fdeaea; }
+        .arch-box.blue-theme { background: rgba(52, 152, 219, 0.15); border-color: rgba(52, 152, 219, 0.3); color: #ebf5fb; }
+
+        .arch-flow-arrow {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 10pt;
+            line-height: 1;
+            margin: -0.5mm 0;
+        }
+
+        /* ===== COVER PAGE DESIGN ===== */
+        .cover-slide {
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20mm;
+        }
+
+        .cover-university {
+            font-size: 12pt;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #a8b5ff;
+            opacity: 0.9;
+            margin-bottom: 2mm;
+        }
+
+        .cover-subject {
+            font-size: 10pt;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 10mm;
+        }
+
+        .cover-icon {
+            font-size: 55pt;
+            margin-bottom: 5mm;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .cover-title {
+            font-size: 34pt;
+            font-weight: 900;
+            line-height: 1.25;
+            letter-spacing: -0.5px;
+            margin-bottom: 4mm;
+            background: linear-gradient(135deg, #ffffff 30%, #a8b5ff 70%, #ff8b8b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(108, 99, 255, 0.25);
+        }
+
+        .cover-subtitle {
+            font-size: 14pt;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 12mm;
+            letter-spacing: 0.5px;
+        }
+
+        .cover-team-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 4mm 12mm;
+            backdrop-filter: blur(10px);
+            width: 70%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .cover-team-title {
+            font-size: 9pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #ff6b6b;
+            margin-bottom: 2.5mm;
+        }
+
+        .cover-team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4mm;
+            width: 100%;
+        }
+
+        .team-member-card {
+            font-size: 8.5pt;
+            line-height: 1.4;
+        }
+
+        .team-member-card .name {
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .team-member-card .id {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 8pt;
+            margin-top: 0.5mm;
+        }
+
+        .team-member-card.leader .name::after {
+            content: '⭐';
+            margin-left: 1mm;
+            font-size: 7.5pt;
+        }
+
+        .cover-date-footer {
+            margin-top: 8mm;
+            font-size: 8.5pt;
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* ===== DESIGN PATTERNS CARDS GRID ===== */
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 3mm;
+            margin-top: 1mm;
+        }
+
+        .pattern-slide-card {
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-top: 3px solid #6c63ff;
+            border-radius: 8px;
+            padding: 3.5mm 4mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 105mm;
+        }
+
+        .pattern-slide-card.color-observer { border-top-color: #2ecc71; }
+        .pattern-slide-card.color-singleton { border-top-color: #e67e22; }
+        .pattern-slide-card.color-strategy { border-top-color: #e74c3c; }
+        .pattern-slide-card.color-template { border-top-color: #3498db; }
+
+        .pattern-slide-card h4 {
+            font-size: 10pt;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 2mm;
+            line-height: 1.3;
+        }
+
+        .pattern-slide-card p {
+            font-size: 7.8pt;
+            line-height: 1.45;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2mm;
+        }
+
+        .pattern-slide-card p strong {
+            color: #a8b5ff;
+            font-weight: 600;
+        }
+
+        .pattern-slide-card code {
+            background: rgba(108, 99, 255, 0.15);
+            color: #d1d5ff;
+            padding: 0.3mm 1mm;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 7.5pt;
+        }
+
+        /* ===== WORK TABLE DESIGN ===== */
+        .work-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 4mm;
+            margin-top: 1mm;
+        }
+
+        .work-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 4mm 4.5mm;
+        }
+
+        .work-card-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 2mm;
+            margin-bottom: 2mm;
+        }
+
+        .work-card-name {
+            font-size: 10.5pt;
+            font-weight: 700;
+            color: #a8b5ff;
+        }
+
+        .work-card-role {
+            font-size: 7.5pt;
+            color: #ff6b6b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 0.5mm;
+        }
+
+        .work-card-tasks {
+            font-size: 7.8pt;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+        }
+
+        .work-card-tasks p {
+            margin-bottom: 1mm;
+            position: relative;
+            padding-left: 3mm;
+        }
+
+        .work-card-tasks p::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #6c63ff;
+        }
+
+        .work-card-tags {
+            margin-top: 3mm;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1mm;
+        }
+
+        .work-tag {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 6.8pt;
+            font-weight: 600;
+            padding: 0.5mm 1.5mm;
+            border-radius: 3px;
+        }
+
+        .work-tag.red-tag { background: rgba(231, 76, 60, 0.1); border-color: rgba(231, 76, 60, 0.2); color: #f9d5d5; }
+        .work-tag.orange-tag { background: rgba(230, 126, 34, 0.1); border-color: rgba(230, 126, 34, 0.2); color: #faebd7; }
+        .work-tag.green-tag { background: rgba(46, 204, 113, 0.1); border-color: rgba(46, 204, 113, 0.2); color: #d5f9e2; }
+
+        /* Highlight glassbox */
+        .highlight-box-slide {
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.1) 0%, rgba(255, 107, 107, 0.05) 100%);
+            border: 1px solid rgba(108, 99, 255, 0.15);
+            border-radius: 8px;
+            padding: 3mm 5mm;
+            margin-top: 3mm;
+        }
+
+        .highlight-box-slide h4 {
+            font-size: 9.5pt;
+            font-weight: 700;
+            color: #a8b5ff;
+            margin-bottom: 1.5mm;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .highlight-box-slide-items {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4mm;
+        }
+
+        .highlight-box-slide-items ul li {
+            font-size: 8pt;
+            margin-bottom: 0.8mm;
+        }
+
+        /* Page layout constraints for print */
+        @media print {
+            body {
+                background: #09071a;
+            }
+            .slide {
+                margin: 0;
+                width: 100%;
+                height: 100vh;
+                page-break-after: always;
+                border: none;
+            }
+            .slide:last-child {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ==================== SLIDE 1: COVER PAGE ==================== -->
+<div class="slide cover-slide">
+    <div class="cover-university">Trường Đại học Công nghệ — ĐHQG Hà Nội (UET)</div>
+    <div class="cover-subject">Báo cáo Bài tập lớn môn Lập trình Hướng đối tượng (OOP)</div>
+
+    <div class="cover-icon">🏛️</div>
+
+    <h1 class="cover-title">HỆ THỐNG ĐẤU GIÁ REAL-TIME</h1>
+    <h2 class="cover-subtitle">Auction System — Client-Server Desktop Application</h2>
+
+    <div class="cover-team-panel">
+        <div class="cover-team-title">Thành viên thực hiện — Nhóm 7</div>
+        <div class="cover-team-grid">
+            <div class="team-member-card leader">
+                <p class="name">Lê Công Xuân Phúc</p>
+                <p class="id">MSSV: 25023358</p>
+            </div>
+            <div class="team-member-card">
+                <p class="name">Hồ Anh Tuấn</p>
+                <p class="id">MSSV: 25023384</p>
+            </div>
+            <div class="team-member-card">
+                <p class="name">Nguyễn Anh Tùng</p>
+                <p class="id">MSSV: 25023389</p>
+            </div>
+            <div class="team-member-card">
+                <p class="name">Trần Thanh Nhật</p>
+                <p class="id">MSSV: 25023348</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="cover-date-footer">Tháng 06/2026</div>
+</div>
+
+<!-- ==================== SLIDE 2: MỤC TIÊU & PHẠM VI ==================== -->
+<div class="slide">
+    <div class="slide-header">
+        <span class="slide-title">1. Mục tiêu & Phạm vi Dự án</span>
+        <span class="slide-title-addon">Mục tiêu & Công nghệ</span>
+    </div>
+
+    <div class="slide-content">
+        <div class="grid-2">
+            <div class="glass-card">
+                <h3>🎯 Mục tiêu dự án</h3>
+                <ul class="green-bullet">
+                    <li>Xây dựng hệ thống <strong>đấu giá trực tuyến real-time</strong> hoạt động mượt mà theo mô hình Client-Server.</li>
+                    <li>Áp dụng chặt chẽ <strong>4 trụ cột OOP</strong> (Kế thừa, Đa hình, Đóng gói, Trừu tượng) vào kiến trúc phần mềm thực tế.</li>
+                    <li>Sử dụng thành thạo các <strong>Design Patterns</strong> thực tế (Factory, Observer, Singleton, Strategy, Template Method).</li>
+                    <li>Giải quyết bài toán <strong>đa luồng (Concurrency)</strong> và đảm bảo an toàn luồng dữ liệu (Thread-safety).</li>
+                    <li>Tích hợp kiểm thử tự động, chuẩn hóa mã nguồn và quy trình <strong>CI/CD hiện đại</strong>.</li>
+                </ul>
+            </div>
+
+            <div class="glass-card">
+                <h3>📦 Phạm vi & Công nghệ</h3>
+                <ul class="blue-bullet" style="margin-bottom: 2mm;">
+                    <li><strong>Tính năng chính:</strong> Multi-role (Bidder/Seller/Admin), đấu giá thời gian thực thông qua Socket, Auto-bidding tự động, Anti-sniping gia hạn giờ cuối, Dashboard quản trị.</li>
+                    <li><strong>Database:</strong> Lưu trữ bền vững dữ liệu tài khoản, lịch sử giao dịch và sản phẩm bằng SQLite + JDBC.</li>
+                </ul>
+                <p style="font-size: 8.5pt; color: #ff6b6b; font-weight: 700; margin-top: 1mm; margin-bottom: 1.5mm;">🛠️ CÔNG NGHỆ CHỦ CHỐT:</p>
+                <div class="badge-container">
+                    <span class="tech-badge">☕ Java 17+</span>
+                    <span class="tech-badge">🖥️ JavaFX 17</span>
+                    <span class="tech-badge">📡 TCP Socket</span>
+                    <span class="tech-badge">🗄️ SQLite + JDBC</span>
+                    <span class="tech-badge">🔒 BCrypt</span>
+                    <span class="tech-badge">📦 Maven</span>
+                    <span class="tech-badge">🔄 Jackson JSON</span>
+                    <span class="tech-badge">🧪 JUnit 5</span>
+                    <span class="tech-badge">🚀 GitHub Actions</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-footer">
+        <span>Hệ thống Đấu giá Real-time — Nhóm 7</span>
+        <span class="team-name">Slide 2/6</span>
+    </div>
+</div>
+
+<!-- ==================== SLIDE 3: KIẾN TRÚC HỆ THỐNG ==================== -->
+<div class="slide">
+    <div class="slide-header">
+        <span class="slide-title">2. Kiến trúc Tổng thể Hệ thống</span>
+        <span class="slide-title-addon">Kiến trúc 5 tầng</span>
+    </div>
+
+    <div class="slide-content">
+        <div class="arch-diagram">
+            <!-- Layer 1 -->
+            <div class="arch-layer">
+                <div class="arch-layer-title">🖥️ UI Client (JavaFX)</div>
+                <div class="arch-layer-boxes">
+                    <span class="arch-box green-theme">login.fxml</span>
+                    <span class="arch-box green-theme">auction.fxml</span>
+                    <span class="arch-box green-theme">create-item.fxml</span>
+                    <span class="arch-box green-theme">item-detail.fxml</span>
+                    <span class="arch-box green-theme">admin-dashboard.fxml</span>
+                </div>
+            </div>
+
+            <div class="arch-flow-arrow">⬇ ⬆ JSON Messages qua TCP/IP Sockets</div>
+
+            <!-- Layer 2 -->
+            <div class="arch-layer">
+                <div class="arch-layer-title">⚙️ Controller Client</div>
+                <div class="arch-layer-boxes">
+                    <span class="arch-box">LoginController</span>
+                    <span class="arch-box">AuctionController</span>
+                    <span class="arch-box">CreateItemController</span>
+                    <span class="arch-box">ItemDetailController</span>
+                    <span class="arch-box">AdminController</span>
+                </div>
+            </div>
+
+            <div class="arch-flow-arrow">⬇ ⬆ Giao tiếp Mạng & Phân luồng (ExecutorService)</div>
+
+            <!-- Layer 3 -->
+            <div class="arch-layer">
+                <div class="arch-layer-title">📡 Server Handler</div>
+                <div class="arch-layer-boxes">
+                    <span class="arch-box orange-theme">AuctionServer</span>
+                    <span class="arch-box orange-theme">ClientHandler (Runnable)</span>
+                    <span class="arch-box orange-theme">AuthHandler</span>
+                    <span class="arch-box orange-theme">BidHandler</span>
+                    <span class="arch-box orange-theme">ItemHandler</span>
+                    <span class="arch-box orange-theme">PaymentHandler</span>
+                </div>
+            </div>
+
+            <div class="arch-flow-arrow">⬇ ⬆ Business Logic & Quản lý Trạng thái</div>
+
+            <!-- Layer 4 -->
+            <div class="arch-layer">
+                <div class="arch-layer-title">🧩 Business Service</div>
+                <div class="arch-layer-boxes">
+                    <span class="arch-box red-theme">AuctionManager (Core)</span>
+                    <span class="arch-box red-theme">AuthService (BCrypt)</span>
+                    <span class="arch-box red-theme">BiddingService</span>
+                    <span class="arch-box red-theme">AutoBidder</span>
+                    <span class="arch-box red-theme">AntiSniping</span>
+                    <span class="arch-box red-theme">NotificationService</span>
+                    <span class="arch-box red-theme">AuctionScheduler</span>
+                </div>
+            </div>
+
+            <div class="arch-flow-arrow">⬇ ⬆ Truy xuất Database độc lập (JDBC)</div>
+
+            <!-- Layer 5 -->
+            <div class="arch-layer">
+                <div class="arch-layer-title">🗄️ Data Access (DAO)</div>
+                <div class="arch-layer-boxes">
+                    <span class="arch-box blue-theme">UserDAO</span>
+                    <span class="arch-box blue-theme">ItemDAO</span>
+                    <span class="arch-box blue-theme">BidTransactionDAO</span>
+                    <span class="arch-box blue-theme">AutoBidDAO</span>
+                    <span class="arch-box blue-theme">DBHelper & HikariCP</span>
+                    <span class="arch-box blue-theme">📁 auction.db (SQLite)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-footer">
+        <span>Hệ thống Đấu giá Real-time — Nhóm 7</span>
+        <span class="team-name">Slide 3/6</span>
+    </div>
+</div>
+
+<!-- ==================== SLIDE 4: DESIGN PATTERNS ==================== -->
+<div class="slide">
+    <div class="slide-header">
+        <span class="slide-title">3. Áp dụng 5 Design Patterns mẫu mực</span>
+        <span class="slide-title-addon">Design Patterns</span>
+    </div>
+
+    <div class="slide-content">
+        <div class="pattern-grid">
+            <!-- Pattern 1 -->
+            <div class="pattern-slide-card">
+                <h4>🏭 Factory Pattern</h4>
+                <p><strong>Lớp:</strong> <code>ItemFactory</code></p>
+                <p><strong>Vấn đề:</strong> Tạo động các loại sản phẩm (Electronics, Art, Vehicle) có thuộc tính khác nhau.</p>
+                <p><strong>Giải pháp:</strong> <code>createItem(type, ...)</code> nhận chuỗi loại và trả về lớp con tương ứng của <code>Item</code>.</p>
+                <p><strong>Ý nghĩa:</strong> Đóng gói logic tạo đối tượng, tuân thủ chặt chẽ Open/Closed Principle.</p>
+            </div>
+
+            <!-- Pattern 2 -->
+            <div class="pattern-slide-card color-observer">
+                <h4>👁️ Observer Pattern</h4>
+                <p><strong>Lớp:</strong> <code>BidObserver</code></p>
+                <p><strong>Vấn đề:</strong> Cập nhật trạng thái thời gian thực và gửi thông báo tới người theo dõi khi có bid mới.</p>
+                <p><strong>Giải pháp:</strong> <code>Bidder</code> implements <code>BidObserver</code>. Lớp Notification quản lý và tự động broadcast.</p>
+                <p><strong>Ý nghĩa:</strong> Giảm liên kết lỏng lẻo giữa luồng đấu giá và hệ thống gửi thông báo.</p>
+            </div>
+
+            <!-- Pattern 3 -->
+            <div class="pattern-slide-card color-singleton">
+                <h4>🎯 Singleton Pattern</h4>
+                <p><strong>Lớp:</strong> <code>AntiSniping</code></p>
+                <p><strong>Vấn đề:</strong> Đảm bảo chỉ có một luồng duy nhất đồng bộ và theo dõi thời gian kết thúc phiên đấu giá.</p>
+                <p><strong>Giải pháp:</strong> Áp dụng Double-checked locking Singleton kết hợp thuộc tính <code>volatile</code> an toàn đa luồng.</p>
+                <p><strong>Ý nghĩa:</strong> Tránh trùng lặp tài nguyên hệ thống và xung đột ghi đè thời gian.</p>
+            </div>
+
+            <!-- Pattern 4 -->
+            <div class="pattern-slide-card color-strategy">
+                <h4>♟️ Strategy Pattern</h4>
+                <p><strong>Lớp:</strong> <code>BiddingStrategy</code></p>
+                <p><strong>Vấn đề:</strong> Linh hoạt thay đổi quy tắc kiểm duyệt tính hợp lệ của giá đấu mới đặt.</p>
+                <p><strong>Giải pháp:</strong> Khai báo interface <code>BiddingStrategy</code> với các lớp cụ thể (Default, Percentage, MinIncrement).</p>
+                <p><strong>Ý nghĩa:</strong> Dễ dàng thay thế quy tắc kinh doanh mà không ảnh hưởng tới code lõi.</p>
+            </div>
+
+            <!-- Pattern 5 -->
+            <div class="pattern-slide-card color-template">
+                <h4>📐 Template Method</h4>
+                <p><strong>Lớp:</strong> <code>Item.java</code></p>
+                <p><strong>Vấn đề:</strong> Các lớp con sản phẩm có chung một quy trình đặt giá nhưng khác biệt logic chuyên biệt.</p>
+                <p><strong>Giải pháp:</strong> Lớp cha abstract định hình khung <code>updateHighestBid()</code>, các lớp con override hooks mở rộng.</p>
+                <p><strong>Ý nghĩa:</strong> Tái sử dụng tối đa code, tránh lặp mã nguồn giữa các phân loại.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-footer">
+        <span>Hệ thống Đấu giá Real-time — Nhóm 7</span>
+        <span class="team-name">Slide 4/6</span>
+    </div>
+</div>
+
+<!-- ==================== SLIDE 5: CHỨC NĂNG NÂNG CAO ==================== -->
+<div class="slide">
+    <div class="slide-header">
+        <span class="slide-title">4. Chức năng Nâng cao & Concurrent</span>
+        <span class="slide-title-addon">Concurrent & Security</span>
+    </div>
+
+    <div class="slide-content">
+        <div class="grid-2">
+            <div class="glass-card">
+                <h3>⚡ Xử lý Đa luồng & Concurrency</h3>
+                <ul class="blue-bullet">
+                    <li><strong>Thread Pool:</strong> Sử dụng <code>ExecutorService</code> (CachedThreadPool) phía Server để tiếp nhận hàng trăm Client kết nối đồng thời qua Socket mà không treo nghẽn hệ thống.</li>
+                    <li><strong>Thread-safe Collections:</strong> Sử dụng <code>ConcurrentHashMap</code> cho dữ liệu phiên đấu giá và <code>CopyOnWriteArrayList</code> cho danh sách kết nối client.</li>
+                    <li><strong>Đồng bộ hóa:</strong> Lock chuyên biệt bằng cơ chế <code>synchronized</code> kết hợp <code>ReentrantLock</code> tại các vùng trọng yếu để ngăn chặn lỗi tranh chấp dữ liệu (Race Conditions).</li>
+                </ul>
+            </div>
+
+            <div class="glass-card">
+                <h3>🛡️ Đấu giá Thông minh & Bảo mật</h3>
+                <ul class="green-bullet">
+                    <li><strong>Auto-Bidding (Đấu giá tự động):</strong> Cho phép người dùng thiết lập mức giá thầu trần mong muốn. Hệ thống tự động đặt giá tăng dần để duy trì vị thế dẫn đầu an toàn và bảo mật.</li>
+                    <li><strong>Anti-Sniping (Chống thầu chụp giờ cuối):</strong> Phát hiện giá thầu đặt trong 10 giây cuối cùng, tự động **gia hạn thêm 20 giây** thời gian kết thúc của phiên, triệt tiêu sniping thầu chụp giật.</li>
+                    <li><strong>Bảo mật mật khẩu:</strong> Mã hóa mật khẩu một chiều cực kỳ an toàn bằng thư viện chuyên dụng **BCrypt** trước khi ghi vào SQLite database.</li>
+                    <li><strong>Quản lý ngoại lệ chặt chẽ:</strong> Định nghĩa bộ Custom Exceptions (InvalidBid, ClosedAuction) kết hợp với Unit Tests Junit 5 đạt tỷ lệ phủ mã nguồn cao.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-footer">
+        <span>Hệ thống Đấu giá Real-time — Nhóm 7</span>
+        <span class="team-name">Slide 5/6</span>
+    </div>
+</div>
+
+<!-- ==================== SLIDE 6: PHÂN CHIA CÔNG VIỆC ==================== -->
+<div class="slide">
+    <div class="slide-header">
+        <span class="slide-title">5. Phân chia Công việc & Tổng kết</span>
+        <span class="slide-title-addon">Phân công công việc</span>
+    </div>
+
+    <div class="slide-content">
+        <div class="work-grid">
+            <!-- Member 1 -->
+            <div class="work-card">
+                <div class="work-card-header">
+                    <p class="work-card-name">Lê Công Xuân Phúc</p>
+                    <p class="work-card-role">Nhóm trưởng — MSSV: 25023358</p>
+                </div>
+                <div class="work-card-tasks">
+                    <p>Thiết kế kiến trúc Socket Client-Server</p>
+                    <p>Xây dựng luồng Server, Handler Layer</p>
+                    <p>Broadcast real-time messages (JSON)</p>
+                    <p>Thiết lập CI/CD GitHub Actions</p>
+                </div>
+                <div class="work-card-tags">
+                    <span class="work-tag red-tag">Server</span>
+                    <span class="work-tag">ClientHandler</span>
+                    <span class="work-tag green-tag">CI/CD</span>
+                </div>
+            </div>
+
+            <!-- Member 2 -->
+            <div class="work-card">
+                <div class="work-card-header">
+                    <p class="work-card-name">Hồ Anh Tuấn</p>
+                    <p class="work-card-role">Core Entity & DB — MSSV: 25023384</p>
+                </div>
+                <div class="work-card-tasks">
+                    <p>Thiết kế OOP Entity Hierarchy (Item, User)</p>
+                    <p>Tích hợp Factory & Observer Patterns</p>
+                    <p>Xây dựng cơ sở dữ liệu SQLite & JDBC</p>
+                    <p>Phát triển tầng DAO (UserDAO, ItemDAO)</p>
+                </div>
+                <div class="work-card-tags">
+                    <span class="work-tag">Entity</span>
+                    <span class="work-tag orange-tag">DAO</span>
+                    <span class="work-tag">SQLite</span>
+                </div>
+            </div>
+
+            <!-- Member 3 -->
+            <div class="work-card">
+                <div class="work-card-header">
+                    <p class="work-card-name">Nguyễn Anh Tùng</p>
+                    <p class="work-card-role">Core Service & Test — MSSV: 25023389</p>
+                </div>
+                <div class="work-card-tasks">
+                    <p>Phát triển Bidding, Auth & Strategy Services</p>
+                    <p>Hiện thực hóa Auto-Bidding & Anti-Sniping</p>
+                    <p>Xử lý Concurrency & Thread-safety lõi</p>
+                    <p>Viết Unit Tests kiểm thử chất lượng (JUnit 5)</p>
+                </div>
+                <div class="work-card-tags">
+                    <span class="work-tag red-tag">Service</span>
+                    <span class="work-tag">AutoBid</span>
+                    <span class="work-tag green-tag">JUnit 5</span>
+                </div>
+            </div>
+
+            <!-- Member 4 -->
+            <div class="work-card">
+                <div class="work-card-header">
+                    <p class="work-card-name">Trần Thanh Nhật</p>
+                    <p class="work-card-role">UI & Controller — MSSV: 25023348</p>
+                </div>
+                <div class="work-card-tasks">
+                    <p>Thiết kế toàn bộ UI FXML & CSS (JavaFX)</p>
+                    <p>Xây dựng Controller Layer liên kết UI</p>
+                    <p>Phát triển Notification & Analytics Services</p>
+                    <p>Hiện thực hóa thanh toán (PaymentHandler)</p>
+                </div>
+                <div class="work-card-tags">
+                    <span class="work-tag">JavaFX</span>
+                    <span class="work-tag orange-tag">UI/CSS</span>
+                    <span class="work-tag">Payment</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rubric highlight summary -->
+        <div class="highlight-box-slide">
+            <h4>📋 BAREM ĐIỂM HOÀN THÀNH XUẤT SẮC</h4>
+            <div class="highlight-box-slide-items">
+                <div>
+                    <ul>
+                        <li>Kế thừa & Kín đóng gói (OOP 4 trụ cột)</li>
+                        <li>Đa hình dynamic & Trừu tượng hóa cao</li>
+                    </ul>
+                </div>
+                <div>
+                    <ul>
+                        <li>5 Design Patterns mẫu mực</li>
+                        <li>Socket đa người chơi thời gian thực</li>
+                    </ul>
+                </div>
+                <div>
+                    <ul>
+                        <li>Thread-safe Concurrency & Auto-Bid</li>
+                        <li>Bảo mật BCrypt & CI/CD GitHub Actions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide-footer">
+        <span>Hệ thống Đấu giá Real-time — Nhóm 7</span>
+        <span class="team-name">Slide 6/6</span>
+    </div>
+</div>
+
+</body>
+</html>

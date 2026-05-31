@@ -5,7 +5,6 @@ import com.auction.dao.UserDAO;
 import com.auction.dto.bid.AutoBidRequest;
 import com.auction.dto.bid.BidRequest;
 import com.auction.entity.bid.BidTransaction;
-import com.auction.entity.items.Item;
 import com.auction.entity.message.Message;
 import com.auction.exception.AuctionClosedException;
 import com.auction.exception.InvalidBidException;
@@ -44,26 +43,6 @@ public class BidHandler {
             boolean success = auctionManager.placeBid(req.getItemId(), req.getBidderId(), req.getAmount());
             out.println(objectMapper.writeValueAsString(
                     new Message("BID_RESULT", String.valueOf(success))));
-            if (success) {
-                // Lấy tên item để hiển thị trong notification
-                Item item = auctionManager.getItem(req.getItemId());
-                String itemName = (item != null) ? item.getName() : req.getItemId();
-                // Lấy username của bidder để hiển thị
-                String bidderName = req.getBidderId();
-                try {
-                    UserDAO.UserRecord rec = userDAO.findById(req.getBidderId());
-                    if (rec != null) bidderName = rec.username;
-                } catch (Exception ignored) {}
-
-                // Tạo notification JSON chi tiết hơn
-                Map<String, Object> bidUpdate = new HashMap<>();
-                bidUpdate.put("itemId", req.getItemId());
-                bidUpdate.put("itemName", itemName);
-                bidUpdate.put("amount", req.getAmount());
-                bidUpdate.put("bidderId", req.getBidderId());
-                bidUpdate.put("bidderName", bidderName);
-                broadcast.accept(new Message("BID_UPDATE", objectMapper.writeValueAsString(bidUpdate)));
-            }
         } catch (InvalidBidException | AuctionClosedException e) {
             try {
                 out.println(objectMapper.writeValueAsString(

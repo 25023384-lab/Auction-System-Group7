@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Báo cáo Hệ thống Đấu giá - Nhóm 7</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            color: #1a1a2e;
+            background: #fff;
+            line-height: 1.5;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        /* ===== PAGE LAYOUT ===== */
+        .page {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            padding: 0;
+            page-break-after: always;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        @media print {
+            body { margin: 0; padding: 0; }
+            .page {
+                margin: 0;
+                width: 210mm;
+                height: 297mm;
+                page-break-after: always;
+            }
+            .page:last-child { page-break-after: avoid; }
+        }
+
+        /* ===== PAGE 1: COVER ===== */
+        .cover-page {
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            padding: 25mm 20mm;
+            display: flex;
+        }
+
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            top: -15%;
+            right: -15%;
+            width: 120mm;
+            height: 120mm;
+            background: radial-gradient(circle, rgba(108, 99, 255, 0.25) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .cover-page::after {
+            content: '';
+            position: absolute;
+            bottom: -15%;
+            left: -15%;
+            width: 100mm;
+            height: 100mm;
+            background: radial-gradient(circle, rgba(255, 107, 107, 0.18) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .cover-university {
+            font-size: 11pt;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            opacity: 0.85;
+            margin-bottom: 3mm;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-subject {
+            font-size: 10pt;
+            font-weight: 400;
+            color: rgba(255, 255, 255, 0.85);
+            margin-bottom: 12mm;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-icon {
+            font-size: 52pt;
+            margin-bottom: 8mm;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-title {
+            font-size: 26pt;
+            font-weight: 800;
+            line-height: 1.25;
+            margin-bottom: 4mm;
+            color: #ffffff;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-subtitle {
+            font-size: 12pt;
+            font-weight: 300;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 16mm;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-team {
+            position: relative;
+            z-index: 1;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 10px;
+            padding: 6mm 12mm;
+            width: 85%;
+        }
+
+        .cover-team h3 {
+            font-size: 10pt;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-bottom: 4mm;
+            color: #a8b5ff;
+        }
+
+        .cover-team-list {
+            list-style: none;
+            font-size: 10.5pt;
+            line-height: 2;
+        }
+
+        .cover-team-list li { color: rgba(255, 255, 255, 0.95); }
+
+        .cover-team-list .leader::after {
+            content: '  ⭐ Nhóm trưởng';
+            font-size: 8pt;
+            color: #ffd700;
+            font-weight: 600;
+        }
+
+        .cover-date {
+            margin-top: 10mm;
+            font-size: 9pt;
+            opacity: 0.45;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ===== CONTENT PAGES ===== */
+        .content-page {
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-top-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #6c63ff, #ff6b6b, #6c63ff);
+            flex-shrink: 0;
+        }
+
+        .page-inner {
+            padding: 8mm 18mm 6mm 18mm;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 3mm;
+            border-bottom: 1px solid #e0e0e0;
+            margin-bottom: 5mm;
+            flex-shrink: 0;
+        }
+
+        .page-header-title {
+            font-size: 7.5pt;
+            color: #999;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .page-header-num {
+            font-size: 7.5pt;
+            color: #6c63ff;
+            font-weight: 700;
+        }
+
+        .page-body {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .page-footer-bar {
+            display: flex;
+            justify-content: space-between;
+            font-size: 7pt;
+            color: #bbb;
+            border-top: 1px solid #eee;
+            padding: 2mm 18mm;
+            flex-shrink: 0;
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        .section-title {
+            font-size: 14pt;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 4mm;
+            padding-left: 3.5mm;
+            border-left: 3.5px solid #6c63ff;
+            line-height: 1.3;
+        }
+
+        .section-subtitle {
+            font-size: 11pt;
+            font-weight: 700;
+            color: #302b63;
+            margin-top: 4mm;
+            margin-bottom: 2.5mm;
+        }
+
+        p, .text {
+            font-size: 9.5pt;
+            line-height: 1.6;
+            color: #333;
+            text-align: justify;
+        }
+
+        ul { padding-left: 4mm; margin: 1.5mm 0; }
+
+        ul li {
+            font-size: 9pt;
+            line-height: 1.55;
+            color: #444;
+            margin-bottom: 1mm;
+        }
+
+        code {
+            background: #f0f0ff;
+            padding: 0 2px;
+            border-radius: 2px;
+            font-size: 8pt;
+            color: #6c63ff;
+            font-family: 'Consolas', 'Monaco', monospace;
+        }
+
+        /* ===== FEATURE GRID ===== */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5mm;
+            margin-top: 2mm;
+        }
+
+        .feature-card {
+            background: #f8f9ff;
+            border: 1px solid #e8eaff;
+            border-radius: 6px;
+            padding: 3mm 3.5mm;
+        }
+
+        .feature-card .fc-icon { font-size: 12pt; margin-bottom: 0.5mm; }
+
+        .feature-card h4 {
+            font-size: 8.5pt;
+            font-weight: 700;
+            color: #302b63;
+            margin-bottom: 0.8mm;
+        }
+
+        .feature-card p {
+            font-size: 7.8pt;
+            line-height: 1.4;
+            color: #666;
+        }
+
+        /* ===== TECH BADGES ===== */
+        .tech-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5mm;
+            margin: 2.5mm 0;
+        }
+
+        .tech-badge {
+            background: linear-gradient(135deg, #302b63, #6c63ff);
+            color: #fff;
+            font-size: 7.5pt;
+            font-weight: 600;
+            padding: 1mm 3mm;
+            border-radius: 20px;
+        }
+
+        /* ===== ARCHITECTURE DIAGRAM ===== */
+        .arch-diagram {
+            background: linear-gradient(135deg, #f8f9ff 0%, #f0f0ff 100%);
+            border: 1px solid #d8daff;
+            border-radius: 8px;
+            padding: 4mm;
+            margin: 3mm 0;
+        }
+
+        .arch-layer {
+            background: #fff;
+            border: 1px solid #e0e3ff;
+            border-radius: 6px;
+            padding: 2.5mm 3.5mm;
+            margin-bottom: 2mm;
+            position: relative;
+        }
+
+        .arch-layer:last-child { margin-bottom: 0; }
+
+        .arch-layer-label {
+            position: absolute;
+            top: -2.5mm;
+            left: 3.5mm;
+            background: #6c63ff;
+            color: #fff;
+            font-size: 6.5pt;
+            font-weight: 700;
+            padding: 0.4mm 2.5mm;
+            border-radius: 3px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .arch-layer-label.green  { background: #2ecc71; }
+        .arch-layer-label.orange { background: #e67e22; }
+        .arch-layer-label.red    { background: #e74c3c; }
+        .arch-layer-label.blue   { background: #3498db; }
+
+        .arch-boxes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5mm;
+            margin-top: 2mm;
+        }
+
+        .arch-box {
+            background: linear-gradient(135deg, #f0f0ff, #e8e8ff);
+            border: 1px solid #d0d0ff;
+            border-radius: 3px;
+            padding: 1mm 2.5mm;
+            font-size: 7pt;
+            font-weight: 600;
+            color: #302b63;
+        }
+
+        .arch-box.green-bg  { background: linear-gradient(135deg, #e8fff0, #d0f5e0); border-color: #a0dbb8; color: #1a7a3a; }
+        .arch-box.orange-bg { background: linear-gradient(135deg, #fff5e8, #ffe8cc); border-color: #f0c89a; color: #8a5a1e; }
+        .arch-box.red-bg    { background: linear-gradient(135deg, #ffe8e8, #ffd0d0); border-color: #f0a0a0; color: #8a1e1e; }
+        .arch-box.blue-bg   { background: linear-gradient(135deg, #e8f4ff, #d0e8ff); border-color: #a0c8f0; color: #1e5a8a; }
+
+        .arch-arrow {
+            text-align: center;
+            color: #aaa;
+            font-size: 12pt;
+            margin: 0.5mm 0;
+            line-height: 1;
+        }
+
+        /* ===== PATTERN CARDS ===== */
+        .pattern-card {
+            background: #fff;
+            border: 1px solid #e8e8e8;
+            border-radius: 6px;
+            padding: 2.5mm 3.5mm;
+            margin-bottom: 2mm;
+            border-left: 3px solid #6c63ff;
+        }
+
+        .pattern-card h4 {
+            font-size: 9pt;
+            font-weight: 700;
+            color: #302b63;
+            margin-bottom: 0.8mm;
+        }
+
+        .pattern-card p {
+            font-size: 8pt;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        /* ===== TWO COLUMN ===== */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3mm;
+        }
+
+        .col-box {
+            background: #f8f9ff;
+            border: 1px solid #e8eaff;
+            border-radius: 6px;
+            padding: 3mm 3.5mm;
+        }
+
+        .col-box h4 {
+            font-size: 9pt;
+            font-weight: 700;
+            color: #302b63;
+            margin-bottom: 1.5mm;
+        }
+
+        .col-box ul { padding-left: 3.5mm; }
+        .col-box li { font-size: 8pt; }
+
+        /* ===== HIGHLIGHT BOX ===== */
+        .highlight-box {
+            background: linear-gradient(135deg, #f0f0ff, #e8eaff);
+            border: 1px solid #d0d4ff;
+            border-radius: 6px;
+            padding: 3mm 4mm;
+            margin-top: 3mm;
+        }
+
+        .highlight-box h4 {
+            font-size: 9.5pt;
+            font-weight: 700;
+            color: #302b63;
+            margin-bottom: 2mm;
+        }
+
+        /* ===== WORK TABLE ===== */
+        .work-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 3mm;
+            font-size: 8pt;
+        }
+
+        .work-table thead {
+            background: linear-gradient(135deg, #302b63, #6c63ff);
+            color: #fff;
+        }
+
+        .work-table th {
+            padding: 2.2mm 2.5mm;
+            text-align: left;
+            font-weight: 600;
+            font-size: 8pt;
+        }
+
+        .work-table td {
+            padding: 2mm 2.5mm;
+            border-bottom: 1px solid #eee;
+            vertical-align: top;
+            line-height: 1.45;
+            font-size: 8pt;
+        }
+
+        .work-table tbody tr:nth-child(even) { background: #f8f9ff; }
+
+        .tag {
+            display: inline-block;
+            background: #f0f0ff;
+            color: #6c63ff;
+            font-size: 6.5pt;
+            font-weight: 600;
+            padding: 0.4mm 1.8mm;
+            border-radius: 3px;
+            margin: 0.3mm;
+            border: 1px solid #d8d8ff;
+        }
+
+        .tag.green  { background: #e8fff0; color: #1a7a3a; border-color: #a0dbb8; }
+        .tag.orange { background: #fff5e8; color: #8a5a1e; border-color: #f0c89a; }
+        .tag.red    { background: #ffe8e8; color: #8a1e1e; border-color: #f0a0a0; }
+
+        /* ===== UTILS ===== */
+        .mb-1 { margin-bottom: 1mm; }
+        .mb-2 { margin-bottom: 2mm; }
+        .mb-3 { margin-bottom: 3mm; }
+        .mt-2 { margin-top: 2mm; }
+        .mt-3 { margin-top: 3mm; }
+        .text-xs   { font-size: 7.5pt; }
+        .text-muted { color: #999; }
+        .divider { border: none; border-top: 1px solid #eee; margin: 2.5mm 0; }
+    </style>
+</head>
+<body>
+
+<!-- ==================== PAGE 1: BÌA ==================== -->
+<div class="page cover-page">
+    <div class="cover-university">Trường Đại học Công nghệ — ĐHQG Hà Nội (UET)</div>
+    <div class="cover-subject">Báo cáo Bài tập lớn môn Lập trình Hướng đối tượng (OOP)</div>
+
+    <div class="cover-icon">🏛️</div>
+
+    <div class="cover-title">HỆ THỐNG ĐẤU GIÁ<br>REAL-TIME</div>
+    <div class="cover-subtitle">Auction System — Client-Server Desktop Application</div>
+
+    <div class="cover-team">
+        <h3>Thành viên Nhóm 7</h3>
+        <ul class="cover-team-list">
+            <li class="leader">Lê Công Xuân Phúc — 25023358</li>
+            <li>Hồ Anh Tuấn — 25023384</li>
+            <li>Nguyễn Anh Tùng — 25023389</li>
+            <li>Trần Thanh Nhật — 25023348</li>
+        </ul>
+    </div>
+
+    <div class="cover-date">Tháng 06 / 2026</div>
+</div>
+
+<!-- ==================== PAGE 2: MỤC TIÊU & PHẠM VI ==================== -->
+<div class="page content-page">
+    <div class="page-top-bar"></div>
+    <div class="page-inner">
+        <div class="page-header">
+            <span class="page-header-title">Báo cáo Hệ thống Đấu giá — Nhóm 7</span>
+            <span class="page-header-num">Trang 2 / 6</span>
+        </div>
+
+        <div class="page-body">
+            <div class="section-title">1. Mục tiêu &amp; Phạm vi thực hiện</div>
+
+            <div class="section-subtitle">1.1. Mục tiêu</div>
+            <p>
+                Xây dựng một <strong>hệ thống đấu giá trực tuyến real-time</strong> hoạt động theo mô hình Client-Server, cho phép nhiều người dùng đồng thời tham gia đặt giá thầu (bid) các sản phẩm. Hệ thống được thiết kế nhằm áp dụng các nguyên lý <strong>Lập trình Hướng đối tượng (OOP)</strong>, các <strong>Design Patterns</strong> tiêu biểu, và xử lý <strong>đa luồng (Concurrency)</strong> trong môi trường thực tế.
+            </p>
+
+            <div class="section-subtitle">1.2. Phạm vi chức năng</div>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="fc-icon">👤</div>
+                    <h4>Quản lý người dùng</h4>
+                    <p>Đăng ký / Đăng nhập với 3 vai trò: Bidder, Seller, Admin. Mật khẩu mã hóa BCrypt.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="fc-icon">📦</div>
+                    <h4>Quản lý sản phẩm</h4>
+                    <p>CRUD sản phẩm đấu giá: Electronics, Art, Vehicle. Hỗ trợ phân trang (Pagination).</p>
+                </div>
+                <div class="feature-card">
+                    <div class="fc-icon">⚡</div>
+                    <h4>Đấu giá Real-time</h4>
+                    <p>Đặt giá thầu trực tuyến, cập nhật real-time qua socket TCP/IP. Hỗ trợ Auto-bidding.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="fc-icon">🛡️</div>
+                    <h4>Anti-Sniping</h4>
+                    <p>Cơ chế chống thầu chụp giờ cuối — tự động gia hạn 20 giây khi có bid trong 10 giây cuối.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="fc-icon">💳</div>
+                    <h4>Thanh toán &amp; Số dư</h4>
+                    <p>Quản lý balance của Bidder, nạp tiền (top-up), thanh toán &amp; hủy đơn sau khi thắng giá.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="fc-icon">🔔</div>
+                    <h4>Thông báo &amp; Lịch sử</h4>
+                    <p>Thông báo real-time cho người theo dõi (Observer Pattern). Lưu lịch sử giao dịch.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="fc-icon">📊</div>
+                    <h4>Analytics &amp; Thống kê</h4>
+                    <p>Phân tích số lượng bid, giá trung bình, xu hướng giá cho từng sản phẩm đấu giá.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="fc-icon">🔧</div>
+                    <h4>Admin Dashboard</h4>
+                    <p>Quản trị viên có giao diện riêng để quản lý toàn bộ người dùng, xóa tài khoản vi phạm.</p>
+                </div>
+            </div>
+
+            <div class="section-subtitle mt-2">1.3. Công nghệ sử dụng</div>
+            <div class="tech-badges">
+                <span class="tech-badge">☕ Java 17+</span>
+                <span class="tech-badge">🖥️ JavaFX 17</span>
+                <span class="tech-badge">📡 TCP/IP Socket</span>
+                <span class="tech-badge">🗄️ SQLite + JDBC</span>
+                <span class="tech-badge">🔒 BCrypt</span>
+                <span class="tech-badge">📦 Maven</span>
+                <span class="tech-badge">🔄 Jackson JSON</span>
+                <span class="tech-badge">🧪 JUnit 5</span>
+                <span class="tech-badge">📝 SLF4J + Logback</span>
+                <span class="tech-badge">✅ Checkstyle</span>
+                <span class="tech-badge">🚀 GitHub Actions CI</span>
+            </div>
+        </div>
+    </div>
+    <div class="page-footer-bar">
+        <span>Nhóm 7 — Hệ thống Đấu giá Real-time</span>
+        <span>Tháng 06/2026</span>
+    </div>
+</div>
+
+<!-- ==================== PAGE 3: KIẾN TRÚC HỆ THỐNG ==================== -->
+<div class="page content-page">
+    <div class="page-top-bar"></div>
+    <div class="page-inner">
+        <div class="page-header">
+            <span class="page-header-title">Báo cáo Hệ thống Đấu giá — Nhóm 7</span>
+            <span class="page-header-num">Trang 3 / 6</span>
+        </div>
+
+        <div class="page-body">
+            <div class="section-title">2. Kiến trúc tổng thể hệ thống</div>
+
+            <p class="mb-2">
+                Hệ thống được xây dựng theo mô hình <strong>Client-Server đa tầng (Multi-layered Architecture)</strong>, kết hợp các design pattern để đảm bảo tính mở rộng, bảo trì và tái sử dụng mã nguồn. Kiến trúc được chia thành <strong>5 tầng chính</strong>:
+            </p>
+
+            <div class="arch-diagram">
+                <div class="arch-layer">
+                    <span class="arch-layer-label green">Presentation Layer — Client (JavaFX)</span>
+                    <div class="arch-boxes">
+                        <span class="arch-box green-bg">🖥️ login.fxml</span>
+                        <span class="arch-box green-bg">📋 auction.fxml</span>
+                        <span class="arch-box green-bg">📝 create-item.fxml</span>
+                        <span class="arch-box green-bg">🔍 item-detail.fxml</span>
+                        <span class="arch-box green-bg">⚙️ admin-dashboard.fxml</span>
+                        <span class="arch-box green-bg">🎨 welcome.fxml</span>
+                    </div>
+                </div>
+
+                <div class="arch-arrow">⬇ ⬆ JSON Messages</div>
+
+                <div class="arch-layer">
+                    <span class="arch-layer-label">Controller Layer</span>
+                    <div class="arch-boxes">
+                        <span class="arch-box">LoginController</span>
+                        <span class="arch-box">AuctionController</span>
+                        <span class="arch-box">CreateItemController</span>
+                        <span class="arch-box">ItemDetailController</span>
+                        <span class="arch-box">AdminController</span>
+                    </div>
+                </div>
+
+                <div class="arch-arrow">⬇ ⬆ TCP/IP Socket</div>
+
+                <div class="arch-layer">
+                    <span class="arch-layer-label orange">Server Handler Layer</span>
+                    <div class="arch-boxes">
+                        <span class="arch-box orange-bg">AuctionServer</span>
+                        <span class="arch-box orange-bg">ClientHandler</span>
+                        <span class="arch-box orange-bg">AuthHandler</span>
+                        <span class="arch-box orange-bg">ItemHandler</span>
+                        <span class="arch-box orange-bg">BidHandler</span>
+                        <span class="arch-box orange-bg">PaymentHandler</span>
+                    </div>
+                </div>
+
+                <div class="arch-arrow">⬇ ⬆</div>
+
+                <div class="arch-layer">
+                    <span class="arch-layer-label red">Service / Business Logic Layer</span>
+                    <div class="arch-boxes">
+                        <span class="arch-box red-bg">AuctionManager</span>
+                        <span class="arch-box red-bg">BiddingService</span>
+                        <span class="arch-box red-bg">AuthService</span>
+                        <span class="arch-box red-bg">AutoBidder</span>
+                        <span class="arch-box red-bg">AntiSniping</span>
+                        <span class="arch-box red-bg">NotificationService</span>
+                        <span class="arch-box red-bg">AnalyticsService</span>
+                        <span class="arch-box red-bg">AuctionScheduler</span>
+                    </div>
+                </div>
+
+                <div class="arch-arrow">⬇ ⬆</div>
+
+                <div class="arch-layer">
+                    <span class="arch-layer-label blue">Data Access Layer (DAO + SQLite)</span>
+                    <div class="arch-boxes">
+                        <span class="arch-box blue-bg">UserDAO</span>
+                        <span class="arch-box blue-bg">ItemDAO</span>
+                        <span class="arch-box blue-bg">BidTransactionDAO</span>
+                        <span class="arch-box blue-bg">AutoBidDAO</span>
+                        <span class="arch-box blue-bg">DBHelper (HikariCP)</span>
+                        <span class="arch-box blue-bg">🗄️ auction.db (SQLite)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-subtitle">Mô tả các tầng kiến trúc</div>
+            <ul>
+                <li><strong>Presentation Layer:</strong> Giao diện JavaFX + FXML, giao tiếp với Server qua <code>ClientConnection</code> (TCP socket). Dữ liệu trao đổi ở định dạng JSON (Jackson).</li>
+                <li><strong>Controller Layer:</strong> Nhận sự kiện từ UI, gửi Message tới Server và xử lý Response trả về từ Server.</li>
+                <li><strong>Server Handler Layer:</strong> <code>AuctionServer</code> lắng nghe kết nối, phân luồng bằng <code>ExecutorService</code>, điều hướng message tới Handler tương ứng. Hỗ trợ broadcast thông báo tới tất cả client.</li>
+                <li><strong>Service Layer:</strong> Xử lý toàn bộ business logic — đấu giá, xác thực, auto-bid, anti-sniping, scheduling, analytics.</li>
+                <li><strong>Data Access Layer:</strong> Các DAO truy xuất SQLite thông qua JDBC, đảm bảo tách biệt giữa logic nghiệp vụ và truy vấn dữ liệu.</li>
+            </ul>
+        </div>
+    </div>
+    <div class="page-footer-bar">
+        <span>Nhóm 7 — Hệ thống Đấu giá Real-time</span>
+        <span>Tháng 06/2026</span>
+    </div>
+</div>
+
+<!-- ==================== PAGE 4: DESIGN PATTERNS & OOP ==================== -->
+<div class="page content-page">
+    <div class="page-top-bar"></div>
+    <div class="page-inner">
+        <div class="page-header">
+            <span class="page-header-title">Báo cáo Hệ thống Đấu giá — Nhóm 7</span>
+            <span class="page-header-num">Trang 4 / 6</span>
+        </div>
+
+        <div class="page-body">
+            <div class="section-title">3. Chức năng &amp; Design Patterns</div>
+
+            <div class="section-subtitle mb-2">3.1. Áp dụng OOP — 4 trụ cột</div>
+            <div class="feature-grid mb-2">
+                <div class="feature-card">
+                    <h4>🔐 Encapsulation (Đóng gói)</h4>
+                    <p>Tất cả thuộc tính khai báo <code>private</code>, truy cập qua getter/setter. Đã refactor toàn bộ từ <code>protected</code> sang <code>private</code> để đảm bảo tính đóng gói.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🧬 Inheritance (Kế thừa)</h4>
+                    <p><code>Entity</code> → <code>User</code> / <code>Item</code> (abstract). <code>User</code> có 3 lớp con: Bidder, Seller, Admin. <code>Item</code> có 3 lớp con: Electronics, Art, Vehicle.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔀 Polymorphism (Đa hình)</h4>
+                    <p>Phương thức <code>printInfo()</code>, <code>displayProfile()</code> được override ở mỗi lớp con. <code>BiddingStrategy</code> interface cho phép thay đổi chiến lược đấu giá linh hoạt.</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🎭 Abstraction (Trừu tượng)</h4>
+                    <p>Abstract class <code>Item</code>, <code>User</code> định nghĩa hành vi chung. Interface <code>BidObserver</code>, <code>BiddingStrategy</code> trừu tượng hóa hành vi hệ thống.</p>
+                </div>
+            </div>
+
+            <div class="section-subtitle mb-2">3.2. Design Patterns đã áp dụng</div>
+
+            <div class="pattern-card">
+                <h4>🏭 Factory Pattern — <code>ItemFactory</code></h4>
+                <p>
+                    <strong>Vấn đề:</strong> Cần tạo các loại sản phẩm khác nhau (Electronics, Art, Vehicle) với thuộc tính riêng biệt.<br>
+                    <strong>Giải pháp:</strong> <code>ItemFactory.createItem(type, ...)</code> nhận tham số <code>type</code> và trả về đối tượng Item tương ứng mà không cần client biết chi tiết lớp con.<br>
+                    <strong>Lý do:</strong> Tăng tính mở rộng — khi thêm loại sản phẩm mới chỉ cần thêm case trong Factory, không sửa code client. Tuân thủ Open/Closed Principle.
+                </p>
+            </div>
+
+            <div class="pattern-card" style="border-left-color: #2ecc71;">
+                <h4>👁️ Observer Pattern — <code>BidObserver</code> + <code>NotificationService</code></h4>
+                <p>
+                    <strong>Vấn đề:</strong> Cần thông báo cho tất cả người theo dõi khi có bid mới trên sản phẩm đấu giá.<br>
+                    <strong>Giải pháp:</strong> Interface <code>BidObserver</code> với phương thức <code>update(itemId, price, bidderId)</code>. <code>NotificationService</code> quản lý danh sách observer và broadcast thông báo. <code>Bidder</code> implements <code>BidObserver</code>.<br>
+                    <strong>Lý do:</strong> Giải bài toán publish/subscribe — thêm/xóa observer mà không sửa logic đấu giá.
+                </p>
+            </div>
+
+            <div class="pattern-card" style="border-left-color: #e67e22;">
+                <h4>🎯 Singleton Pattern — <code>AntiSniping</code> + <code>RealtimeNotifier</code></h4>
+                <p>
+                    <strong>Vấn đề:</strong> Cần đảm bảo chỉ có duy nhất một instance quản lý thời gian đấu giá và thông báo realtime.<br>
+                    <strong>Giải pháp:</strong> Double-checked locking Singleton trong <code>AntiSniping.getInstance()</code> và <code>RealtimeNotifier.getInstance()</code>.<br>
+                    <strong>Lý do:</strong> Tránh xung đột dữ liệu khi nhiều thread cùng truy cập tài nguyên dùng chung (thời gian đấu giá).
+                </p>
+            </div>
+
+            <div class="pattern-card" style="border-left-color: #e74c3c;">
+                <h4>♟️ Strategy Pattern — <code>BiddingStrategy</code></h4>
+                <p>
+                    <strong>Vấn đề:</strong> Cần linh hoạt thay đổi quy tắc kiểm tra bid hợp lệ (bid cao hơn giá hiện tại, hoặc cao hơn ít nhất 5%).<br>
+                    <strong>Giải pháp:</strong> Interface <code>BiddingStrategy</code> với method <code>isValidBid(currentHighest, newBid)</code>. <code>DefaultBiddingStrategy</code> kiểm tra <code>newBid &gt; currentHighest</code>.<br>
+                    <strong>Lý do:</strong> Có thể thêm strategy mới (MinIncrementStrategy, PercentageStrategy) mà không sửa logic hiện tại — tuân thủ Open/Closed Principle.
+                </p>
+            </div>
+
+            <div class="pattern-card" style="border-left-color: #3498db;">
+                <h4>📐 Template Method — <code>Item.updateHighestBid()</code></h4>
+                <p>
+                    <strong>Vấn đề:</strong> Các loại Item có cùng thuật toán cập nhật giá cao nhất nhưng có thể mở rộng thêm logic riêng.<br>
+                    <strong>Giải pháp:</strong> Phương thức <code>updateHighestBid()</code> trong abstract class <code>Item</code> định nghĩa skeleton algorithm, các lớp con override nếu cần.<br>
+                    <strong>Lý do:</strong> Đảm bảo nhất quán trong logic cập nhật giá, đồng thời cho phép tùy biến ở lớp con.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="page-footer-bar">
+        <span>Nhóm 7 — Hệ thống Đấu giá Real-time</span>
+        <span>Tháng 06/2026</span>
+    </div>
+</div>
+
+<!-- ==================== PAGE 5: CHỨC NĂNG NÂNG CAO ==================== -->
+<div class="page content-page">
+    <div class="page-top-bar"></div>
+    <div class="page-inner">
+        <div class="page-header">
+            <span class="page-header-title">Báo cáo Hệ thống Đấu giá — Nhóm 7</span>
+            <span class="page-header-num">Trang 5 / 6</span>
+        </div>
+
+        <div class="page-body">
+            <div class="section-title">4. Chức năng nâng cao &amp; Concurrent</div>
+
+            <div class="section-subtitle">4.1. Xử lý đa luồng (Concurrency)</div>
+            <p class="mb-2">
+                Hệ thống xử lý nhiều client đồng thời thông qua <strong>thread pool</strong> với <code>ExecutorService (CachedThreadPool)</code>. Các cấu trúc dữ liệu thread-safe được sử dụng xuyên suốt:
+            </p>
+
+            <div class="two-col mb-2">
+                <div class="col-box">
+                    <h4>🔒 Thread-safe Collections</h4>
+                    <ul>
+                        <li><code>ConcurrentHashMap</code> cho activeAuctions, bidders, auctionEndTime</li>
+                        <li><code>CopyOnWriteArrayList</code> cho observers, transactionHistory, clients</li>
+                    </ul>
+                </div>
+                <div class="col-box">
+                    <h4>⚙️ Concurrent Mechanisms</h4>
+                    <ul>
+                        <li><code>ScheduledExecutorService</code> cho AuctionScheduler &amp; countdown timer</li>
+                        <li><code>synchronized</code> double-checked locking cho Singleton</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section-subtitle">4.2. Auto-Bidding (Đấu giá tự động)</div>
+            <p class="mb-2">
+                <code>AutoBidder</code> cho phép người dùng đặt giá trần (max bid). Khi có bid mới từ người khác, hệ thống tự động đặt bid cao hơn cho đến khi đạt giới hạn. Auto-bid được lưu trong database (<code>AutoBidDAO</code>) và được kích hoạt tự động phía server.
+            </p>
+
+            <div class="section-subtitle">4.3. Anti-Sniping (Chống thầu chụp giờ cuối)</div>
+            <p class="mb-2">
+                Khi phát hiện bid mới trong <strong>10 giây cuối cùng</strong> của phiên đấu giá, hệ thống tự động <strong>gia hạn thêm 20 giây</strong>. Cơ chế này ngăn chặn chiến thuật "sniping" — đặt bid vào giây cuối để người khác không kịp phản hồi. Implementation sử dụng Singleton <code>AntiSniping</code> với <code>ConcurrentHashMap</code> lưu endTime cho từng phiên.
+            </p>
+
+            <div class="section-subtitle">4.4. Real-time Communication</div>
+            <p class="mb-2">
+                Server duy trì danh sách <code>CopyOnWriteArrayList&lt;ClientHandler&gt;</code> để <strong>broadcast</strong> message tới tất cả client khi có sự kiện: bid mới, item được tạo/xóa/cập nhật, thanh toán thành công. Message được serialize/deserialize bằng Jackson <code>ObjectMapper</code>.
+            </p>
+
+            <hr class="divider">
+
+            <div class="section-title">5. Xử lý lỗi &amp; Bảo mật</div>
+
+            <div class="two-col mb-2">
+                <div class="col-box">
+                    <h4>⚠️ Exception Handling</h4>
+                    <ul>
+                        <li><code>InvalidBidException</code> — giá bid thấp hơn giá hiện tại</li>
+                        <li><code>AuctionClosedException</code> — phiên đã kết thúc</li>
+                        <li><code>AuthenticationException</code> — sai mật khẩu / user không tồn tại</li>
+                        <li><code>AuctionException</code> — exception tổng quát</li>
+                        <li>Xử lý <code>SQLException</code> trong tất cả DAO</li>
+                    </ul>
+                </div>
+                <div class="col-box">
+                    <h4>🔒 Bảo mật</h4>
+                    <ul>
+                        <li><strong>BCrypt hashing</strong> — mật khẩu không lưu plain text</li>
+                        <li><strong>UUID</strong> — ID người dùng ngẫu nhiên, không dự đoán được</li>
+                        <li><strong>Input validation</strong> — kiểm tra giá bid, quyền truy cập</li>
+                        <li><strong>Role-based access</strong> — phân quyền Bidder/Seller/Admin</li>
+                    </ul>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <div class="section-title">6. Kiểm thử &amp; CI/CD</div>
+
+            <div class="two-col">
+                <div class="col-box">
+                    <h4>🧪 Unit Testing (JUnit 5)</h4>
+                    <ul>
+                        <li><code>AuctionManagerTest</code> — quản lý đấu giá, đặt bid, bid không hợp lệ</li>
+                        <li><code>AuthServiceTest</code> — đăng ký, đăng nhập, xác thực BCrypt</li>
+                        <li><code>DefaultBiddingStrategyTest</code> — kiểm thử chiến lược bid</li>
+                    </ul>
+                </div>
+                <div class="col-box">
+                    <h4>🚀 CI/CD &amp; Code Quality</h4>
+                    <ul>
+                        <li><strong>GitHub Actions</strong> — tự động chạy <code>mvn test</code> khi push/PR</li>
+                        <li><strong>Checkstyle</strong> — kiểm tra coding conventions tự động</li>
+                        <li><strong>Maven Build</strong> — quản lý dependencies và packaging</li>
+                        <li><strong>Git</strong> — version control với branching strategy</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-footer-bar">
+        <span>Nhóm 7 — Hệ thống Đấu giá Real-time</span>
+        <span>Tháng 06/2026</span>
+    </div>
+</div>
+
+<!-- ==================== PAGE 6: PHÂN CHIA CÔNG VIỆC ==================== -->
+<div class="page content-page">
+    <div class="page-top-bar"></div>
+    <div class="page-inner">
+        <div class="page-header">
+            <span class="page-header-title">Báo cáo Hệ thống Đấu giá — Nhóm 7</span>
+            <span class="page-header-num">Trang 6 / 6</span>
+        </div>
+
+        <div class="page-body">
+            <div class="section-title">7. Phân chia công việc</div>
+
+            <table class="work-table">
+                <thead>
+                    <tr>
+                        <th style="width:22%">Thành viên</th>
+                        <th style="width:10%">MSSV</th>
+                        <th style="width:44%">Công việc chính</th>
+                        <th style="width:24%">Package / Module</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <strong>Lê Công Xuân Phúc</strong><br>
+                            <span class="text-xs text-muted">(Nhóm trưởng)</span>
+                        </td>
+                        <td>25023358</td>
+                        <td>
+                            • Thiết kế kiến trúc tổng thể Client-Server<br>
+                            • Xây dựng Server, Handler Layer<br>
+                            • Implement AuctionServer, ClientHandler<br>
+                            • Xử lý broadcast &amp; real-time communication<br>
+                            • Tích hợp CI/CD (GitHub Actions)
+                        </td>
+                        <td>
+                            <span class="tag">server</span>
+                            <span class="tag">handler</span>
+                            <span class="tag">client</span>
+                            <span class="tag green">.github/workflows</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Hồ Anh Tuấn</strong></td>
+                        <td>25023384</td>
+                        <td>
+                            • Xây dựng Entity layer (User, Item hierarchy)<br>
+                            • Implement Factory Pattern (ItemFactory)<br>
+                            • Implement Observer Pattern (BidObserver)<br>
+                            • Xây dựng DAO layer (UserDAO, ItemDAO)<br>
+                            • Thiết kế database schema (SQLite)
+                        </td>
+                        <td>
+                            <span class="tag">entity</span>
+                            <span class="tag">factory</span>
+                            <span class="tag orange">dao</span>
+                            <span class="tag orange">util</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Nguyễn Anh Tùng</strong></td>
+                        <td>25023389</td>
+                        <td>
+                            • Xây dựng Service Layer (BiddingService, AuthService)<br>
+                            • Implement Strategy Pattern, Singleton Pattern<br>
+                            • Implement Auto-Bidding &amp; Anti-Sniping<br>
+                            • Xử lý Concurrency (thread-safe collections)<br>
+                            • Viết Unit Tests (JUnit 5)
+                        </td>
+                        <td>
+                            <span class="tag red">service/auction</span>
+                            <span class="tag red">service/bidding</span>
+                            <span class="tag red">service/auth</span>
+                            <span class="tag">test</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Trần Thanh Nhật</strong></td>
+                        <td>25023348</td>
+                        <td>
+                            • Thiết kế giao diện JavaFX (FXML + CSS)<br>
+                            • Xây dựng Controller layer<br>
+                            • Implement Notification Service, Analytics<br>
+                            • Xử lý thanh toán (PaymentHandler)<br>
+                            • Viết tài liệu báo cáo &amp; README
+                        </td>
+                        <td>
+                            <span class="tag green">controller</span>
+                            <span class="tag green">resources (FXML)</span>
+                            <span class="tag">service/notification</span>
+                            <span class="tag">service/analytics</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="highlight-box mt-3">
+                <h4>📋 Tổng kết barem điểm đạt được</h4>
+                <div class="two-col mt-2">
+                    <div>
+                        <ul>
+                            <li>✅ <strong>OOP</strong> — Inheritance, Polymorphism, Encapsulation, Abstraction</li>
+                            <li>✅ <strong>Design Patterns</strong> — Singleton, Factory, Observer, Strategy, Template Method</li>
+                            <li>✅ <strong>Concurrency</strong> — Thread-safe collections, ExecutorService, ScheduledExecutor</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul>
+                            <li>✅ <strong>Exception Handling</strong> — Custom exceptions cho từng loại lỗi</li>
+                            <li>✅ <strong>Unit Tests</strong> — JUnit 5 cho core services</li>
+                            <li>✅ <strong>Build &amp; CI/CD</strong> — Maven, Checkstyle, GitHub Actions</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box mt-2" style="background: linear-gradient(135deg, #e8fff0, #d0ffe8); border-color: #a0dbb8;">
+                <h4 style="color: #1a7a3a;">🌟 Điểm nổi bật của dự án</h4>
+                <div class="two-col mt-2">
+                    <div>
+                        <ul>
+                            <li><strong>Real-time bidding</strong> — đấu giá trực tiếp qua TCP socket</li>
+                            <li><strong>Auto-Bidding</strong> — đặt giá tự động theo giá trần</li>
+                            <li><strong>Anti-Sniping</strong> — chống thầu chụp giờ cuối</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <ul>
+                            <li><strong>Multi-role system</strong> — Bidder, Seller, Admin</li>
+                            <li><strong>BCrypt security</strong> — mã hóa mật khẩu an toàn</li>
+                            <li><strong>Full-stack desktop app</strong> — JavaFX + Server + SQLite</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page-footer-bar">
+        <span>Nhóm 7 — Hệ thống Đấu giá Real-time</span>
+        <span>Tháng 06/2026</span>
+    </div>
+</div>
+
+</body>
+</html>
