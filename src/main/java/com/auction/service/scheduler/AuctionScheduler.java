@@ -36,11 +36,10 @@ public class AuctionScheduler {
             System.err.println("Error loading initial items: " + e.getMessage());
         }
 
-        scheduler.scheduleAtFixedRate(this::checkAuctions, 0, 5, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(this::checkAuctions, 0, 1, TimeUnit.SECONDS);
     }
 
     private void checkAuctions() {
-        System.out.println("Checking auctions...");
         try {
             List<Item> allItems = itemDAO.findAll();
             LocalDateTime now = LocalDateTime.now();

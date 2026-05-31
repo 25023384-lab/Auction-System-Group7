@@ -91,8 +91,11 @@ public class AuctionUIHelper {
         priceSeries.getData().clear();
         if (item != null) {
             priceSeries.setName(item.getName());
-            priceSeries.getData().add(new XYChart.Data<>("Start", item.getStartingPrice()));
-            priceSeries.getData().add(new XYChart.Data<>("Now", item.getCurrentHighestBid()));
+            if (item.getCurrentHighestBid() > item.getStartingPrice()) {
+                priceSeries.getData().add(new XYChart.Data<>("Current Bid", item.getCurrentHighestBid()));
+            } else {
+                priceSeries.getData().add(new XYChart.Data<>("Start", item.getStartingPrice()));
+            }
         }
     }
 }
