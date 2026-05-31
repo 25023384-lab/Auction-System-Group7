@@ -16,6 +16,7 @@ Dự án xây dựng một hệ thống đấu giá trực tuyến client-server
 
 ### Công nghệ
 
+- **Agent hỗ trợ: ** Chat gpt, Claude, Copilot, Gemini
 - **Ngôn ngữ lập trình:** Java 11+
 - **Giao diện người dùng (GUI):** JavaFX
 - **Cơ sở dữ liệu:** SQLite
