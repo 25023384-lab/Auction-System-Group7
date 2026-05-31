@@ -39,23 +39,56 @@ Dự án được tổ chức theo các package có trách nhiệm rõ ràng:
 
 ```
 src/main/java/com/auction/
-├── app/                # Chứa lớp Main, điểm khởi đầu của ứng dụng.
-├── client/             # Các lớp liên quan đến phía Client (GUI Controllers, networking).
-├── server/             # Các lớp liên quan đến phía Server (AuctionServer, ClientHandler).
-├── dao/                # Data Access Objects - Các lớp giao tiếp trực tiếp với CSDL.
-├── entity/             # Các lớp thực thể (POJO) như User, Item, BidTransaction.
-├── exception/          # Các lớp ngoại lệ tùy chỉnh của ứng dụng.
-├── service/            # Lõi nghiệp vụ của hệ thống.
-│   ├── auction/        # Quản lý phiên đấu giá, chống sniping.
-│   ├── auth/           # Xử lý đăng nhập, đăng ký.
-│   ├── bidding/        # Xử lý logic đặt giá, auto-bid, phân tích.
-│   ├── factory/        # Factory Pattern để tạo các loại Item.
-│   ├── notification/   # Dịch vụ thông báo (Observer Pattern).
-│   ├── realtime/       # Xử lý các tác vụ thời gian thực, đếm ngược.
-│   └── scheduler/      # Tự động bắt đầu/kết thúc phiên đấu giá.
-└── resources/
-    ├── fxml/           # Các file FXML định nghĩa giao diện.
-    └── auction.db      # File cơ sở dữ liệu SQLite.
+├── app/
+│   └── MainApp.java             # Khởi chạy JavaFX và thiết lập kết nối ban đầu
+├── client/
+│   ├── network/
+│   │   └── ServerProxy.java     # Đại diện kết nối phía server (Socket/RMI)
+│   └── controller/
+│       ├── LoginController.java
+│       ├── DashboardController.java
+│       └── AuctionRoomController.java
+├── server/
+│   ├── AuctionServer.java       # Lắng nghe kết nối từ các Client
+│   ├── ClientHandler.java       # Quản lý từng luồng (Thread) cho mỗi Client
+│   └── ServerConfig.java        # Cấu hình Port, Thread Pool, Database URL
+├── dao/
+│   ├── BaseDAO.java             # Interface chung cho CRUD
+│   ├── UserDAO.java             # Thực thi truy vấn cho bảng User
+│   ├── ItemDAO.java             # Thực thi truy vấn cho bảng Item
+│   └── BidDAO.java              # Lưu lịch sử đặt giá
+├── entity/
+│   ├── User.java                # Thông tin người dùng (id, username, balance)
+│   ├── Item.java                # Thông tin sản phẩm đấu giá
+│   ├── Bid.java                 # Lịch sử một lần đặt giá
+│   └── AuctionSession.java      # Trạng thái phiên (đang diễn ra, kết thúc)
+├── exception/
+│   ├── InsufficientBalanceException.java  # Lỗi không đủ tiền đặt giá
+│   ├── InvalidBidException.java           # Lỗi đặt giá thấp hơn giá hiện tại
+│   └── AuctionClosedException.java        # Lỗi đặt giá khi phiên đã kết thúc
+├── service/
+│   ├── auction/
+│   │   ├── AuctionManager.java      # Điều phối toàn bộ phiên đấu giá
+│   │   └── SnipingProtector.java    # Logic tự động gia hạn thời gian nếu có bid phút cuối
+│   ├── auth/
+│   │   ├── AuthService.java         # Xác thực tài khoản
+│   │   └── PasswordHasher.java      # Mã hóa mật khẩu (BCrypt)
+│   ├── bidding/
+│   │   ├── BidProcessor.java        # Xử lý logic so sánh giá, cập nhật Winner
+│   │   └── AutoBidAgent.java        # Logic cho Bot hoặc tính năng tự động đặt giá
+│   ├── factory/
+│   │   ├── ItemFactory.java         # Khởi tạo các loại Item (Electronics, Art,...)
+│   │   └── AuctionFactory.java      # Tạo các kiểu phiên (English, Dutch Auction)
+│   ├── notification/
+│   │   ├── NotificationService.java # Gửi thông báo đến Client
+│   │   └── Subject.java             # Interface trong Observer Pattern
+│   ├── realtime/
+│   │   └── CountdownTimer.java      # Quản lý đồng hồ đếm ngược cho mỗi Item
+│   └── scheduler/
+│       └── AuctionTask.java         # Task chạy ngầm để đóng/mở phiên theo giờ
+└── util/                        # (Bổ sung) Các tiện ích dùng chung
+    ├── DatabaseConnection.java  # Singleton quản lý kết nối SQLite
+    └── Validator.java           # Kiểm tra dữ liệu đầu vào
 ```
 
 ---
