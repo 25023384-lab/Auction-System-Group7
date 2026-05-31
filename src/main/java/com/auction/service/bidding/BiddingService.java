@@ -145,12 +145,7 @@ public class BiddingService {
         // Ghi analytics
         analyticsService.recordBid(itemId, bidAmount);
 
-        // Trigger auto-bid
-        if (autoBidder != null) {
-            autoBidder.onNewBid(itemId, bidderId, bidAmount);
-        }
-
-        // Tạo transaction và lưu DB
+        // Tạo transaction và lưu DB TRƯỚC KHI trigger auto-bid
         BidTransaction tx = new BidTransaction(itemId, bidderId, bidAmount);
         tx.markAsWinning();
         saveBidToDatabase(itemId, bidderId, bidAmount, tx);
@@ -163,6 +158,14 @@ public class BiddingService {
         notificationService.notifyObservers(itemId, bidAmount, bidderId);
         // NOTE: notifyRealtime() đã bị bỏ — BidHandler.handleBid() sẽ broadcast BID_UPDATE
         //       với đầy đủ thông tin (có kèm bidderName), tránh client nhận 2 lần.
+
+        // Trigger auto-bid BẤT ĐỒNG BỘ sau khi đã lưu DB xong
+        // Tránh lỗi đệ quy ngược (stack unwinding) ghi đè kết quả auto-bid
+        if (autoBidder != null) {
+            java.util.concurrent.CompletableFuture.runAsync(() -> {
+                autoBidder.onNewBid(itemId, bidderId, bidAmount);
+            });
+        }
     }
 
     // Đánh dấu tất cả transaction cũ của item này là không thắng
