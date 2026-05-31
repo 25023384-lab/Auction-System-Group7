@@ -120,7 +120,7 @@ Mỗi lệnh sẽ mở một cửa sổ giao diện đăng nhập của ứng d�
 
 ## 7. Link báo cáo và Video Demo
 
-- **Báo cáo PDF:** `[Link đến file báo cáo của bạn]`
-- **Video Demo:** `[Link đến video trên YouTube, Google Drive, v.v.]`
+- **Báo cáo PDF:** https://drive.google.com/file/d/1Z7cm6GqY02FkX8Bp_SLiM6VKlN0zI2v6/view?usp=sharing
+- **Video Demo:** https://drive.google.com/file/d/1GNNOiD7CVoP4NkqS6z5ovyL8J1zAUh27/view?usp=drive_link
 
 ---
