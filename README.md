@@ -87,7 +87,7 @@ mvn clean package
 Trong Terminal, chạy lệnh sau:
 
 ```bash
-java -jar target/Auction-System-Group7-pi-1.0-SNAPSHOT.jar server
+java -jar target/auction-system-1.0-SNAPSHOT.jar server
 ```
 
 Khi Server khởi động thành công, bạn sẽ thấy thông báo tương tự như: `Server is listening on port 12345`.
@@ -97,7 +97,7 @@ Khi Server khởi động thành công, bạn sẽ thấy thông báo tương t�
 Mở một hoặc nhiều cửa sổ Terminal mới và chạy lệnh sau để khởi động mỗi Client:
 
 ```bash
-java -jar target/Auction-System-Group7-pi-1.0-SNAPSHOT.jar
+java -jar target/auction-system-1.0-SNAPSHOT.jar
 ```
 
 Mỗi lệnh sẽ mở một cửa sổ giao diện đăng nhập của ứng dụng.
