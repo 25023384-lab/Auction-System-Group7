@@ -1,84 +1,131 @@
 @startuml
-' Cấu hình giao diện sơ đồ cho đẹp và rõ ràng
+skinparam packageStyle rectangle
 skinparam classAttributeIconSize 0
-skinparam linetype ortho
+skinparam dpi 300
+scale 1.5
 
-' --- TẦNG 1: LỚP CƠ SỞ (Mục 3.3.1) ---
-abstract class Entity {
-    - id: String
-    + getId(): String
+' ==========================================
+' 1. MÔ HÌNH NGƯỜI DÙNG (USER ENTITIES)
+' ==========================================
+package "Entity - User" {
+    abstract class User {
+        # id: String
+        # username: String
+        # role: String
+        # balance: double
+        + getBalance(): double
+        + setBalance(balance: double): void
+    }
+
+    class Bidder extends User {
+        + placeBid(item: Item, amount: double): boolean
+    }
+
+    class Seller extends User {
+        - myItems: List<Item>
+        + addItem(item: Item): void
+        + getMyItems(): List<Item>
+    }
+
+    class Admin extends User {
+        + banUser(userId: String): void
+        + cancelAuction(itemId: String): void
+    }
 }
 
-' --- TẦNG 2: PHÂN CẤP ITEM VÀ USER (Mục 3.3.2) ---
-abstract class Item {
-    <<abstract>>
-    - name: String
-    - startingPrice: double
-    - currentHighestBid: double
-    - highestBidderId: String
-    + getName(): String
-    + printInfo()*
+' ==========================================
+' 2. MÔ HÌNH SẢN PHẨM & FACTORY (ITEM ENTITIES)
+' ==========================================
+package "Entity - Item" {
+    enum AuctionStatus {
+        PENDING, OPEN, RUNNING, FINISHED, PAID, CANCELED
+    }
+
+    abstract class Item {
+        # itemId: String
+        # name: String
+        # startingPrice: double
+        # currentHighestBid: double
+        # startTime: LocalDateTime
+        # endTime: LocalDateTime
+        # status: AuctionStatus
+        + updateHighestBid(amount: double, bidderId: String): boolean
+        + getRemainingTime(): long
+    }
+
+    class Electronics extends Item {
+        - warrantyMonths: int
+    }
+    class Art extends Item {
+        - artistName: String
+    }
+    class Vehicle extends Item {
+        - mileage: int
+    }
+    
+    class ItemFactory {
+        + {static} createItem(type: String, params: Object...): Item
+    }
+    
+    Item *-- AuctionStatus
+    ItemFactory ..> Item : "Tạo đối tượng"
 }
 
-abstract class User {
-    <<abstract>>
-    - username: String
-    - role: String
-    + getUsername(): String
-    + getRole(): String
-    + displayProfile()*
+' ==========================================
+' 3. HỆ THỐNG XỬ LÝ LÕI (CORE SERVICES)
+' ==========================================
+package "Business Logic (Services)" {
+    class AuctionManager {
+        - activeAuctions: Map<String, Item>
+        + placeBid(itemId: String, bidderId: String, amount: double): boolean
+    }
+
+    class BiddingService {
+        + placeBid(itemId: String, bidderId: String, amount: double): boolean
+        - validateAndExecuteBid(item: Item, amount: double): void
+    }
+
+    class AutoBidder {
+        - configs: Map<String, List<AutoConfig>>
+        + register(bidderId: String, itemId: String, maxBid: double): void
+        + onNewBid(itemId: String, currentPrice: double): void
+    }
+
+    class AntiSniping {
+        + checkAndExtend(itemId: String): int
+    }
+
+    class AuctionScheduler {
+        - scheduler: ScheduledExecutorService
+        + checkAuctions(): void
+    }
+
+    class NotificationService {
+        - observers: List<BidObserver>
+        + notifyObservers(itemId: String, price: double, bidderId: String): void
+    }
 }
 
-' --- TẦNG 3: CÁC LỚP CON CỤ THỂ (Mục 3.3.2) ---
-class Electronics {
-    - warrantyMonths: int
-    + printInfo()
-}
+' ==========================================
+' MỐI QUAN HỆ CHẶT CHẼ (RELATIONSHIPS)
+' ==========================================
 
-class Art {
-    - artistName: String
-    + printInfo()
-}
+' Người dùng và Sản phẩm
+Bidder "1" --> "*" Item : "Đặt giá >"
+Seller "1" --> "*" Item : "Đăng bán >"
 
-class Vehicle {
-    - engineCC: int
-    + printInfo()
-}
+' Các lớp xử lý (Services)
+AuctionManager *-- BiddingService : "Chứa"
+AuctionManager *-- AutoBidder : "Chứa"
+AuctionManager *-- AntiSniping : "Chứa"
+AuctionManager *-- AuctionScheduler : "Chứa"
+AuctionManager *-- NotificationService : "Chứa"
 
-class Bidder {
-    - balance: double
-    + displayProfile()
-}
+BiddingService ..> Item : "Kiểm tra & Cập nhật giá"
+BiddingService ..> AutoBidder : "Kích hoạt vòng lặp Auto-Bid"
+BiddingService ..> NotificationService : "Gửi thông báo UI"
 
-class Seller {
-    - revenue: double
-    + displayProfile()
-}
-
-class Admin {
-    - permissionLevel: int
-    + displayProfile()
-}
-
-' --- TẦNG 4: INTERFACE (Mục 3.6 - Observer Pattern) ---
-interface BidObserver {
-    <<interface>>
-    + update(itemId: String, newBid: double)
-}
-
-' --- THIẾT LẬP MỐI QUAN HỆ KẾ THỪA VÀ TRIỂN KHAI ---[cite: 1]
-Entity <|-- Item
-Entity <|-- User
-
-Item <|-- Electronics
-Item <|-- Art
-Item <|-- Vehicle
-
-User <|-- Bidder
-User <|-- Seller
-User <|-- Admin
-
-' Bidder thực hiện cơ chế Observer để nhận thông báo realtime (Mục 3.2.4)[cite: 1]
-BidObserver <|.. Bidder
+AutoBidder ..> AuctionManager : "Gọi ngược để tự động đặt giá"
+AuctionScheduler ..> Item : "Kiểm tra hết giờ & Đóng phiên"
 
 @enduml
