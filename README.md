@@ -40,55 +40,107 @@ Dự án được tổ chức theo các package có trách nhiệm rõ ràng:
 ```
 src/main/java/com/auction/
 ├── app/
-│   └── MainApp.java             # Khởi chạy JavaFX và thiết lập kết nối ban đầu
+│   └── Main.java                         # Hàm main chính, điều hướng chạy Server hoặc Client tùy thuộc tham số đầu vào
 ├── client/
-│   ├── network/
-│   │   └── ServerProxy.java     # Đại diện kết nối phía server (Socket/RMI)
-│   └── controller/
-│       ├── LoginController.java
-│       ├── DashboardController.java
-│       └── AuctionRoomController.java
-├── server/
-│   ├── AuctionServer.java       # Lắng nghe kết nối từ các Client
-│   ├── ClientHandler.java       # Quản lý từng luồng (Thread) cho mỗi Client
-│   └── ServerConfig.java        # Cấu hình Port, Thread Pool, Database URL
-├── dao/
-│   ├── BaseDAO.java             # Interface chung cho CRUD
-│   ├── UserDAO.java             # Thực thi truy vấn cho bảng User
-│   ├── ItemDAO.java             # Thực thi truy vấn cho bảng Item
-│   └── BidDAO.java              # Lưu lịch sử đặt giá
-├── entity/
-│   ├── User.java                # Thông tin người dùng (id, username, balance)
-│   ├── Item.java                # Thông tin sản phẩm đấu giá
-│   ├── Bid.java                 # Lịch sử một lần đặt giá
-│   └── AuctionSession.java      # Trạng thái phiên (đang diễn ra, kết thúc)
-├── exception/
-│   ├── InsufficientBalanceException.java  # Lỗi không đủ tiền đặt giá
-│   ├── InvalidBidException.java           # Lỗi đặt giá thấp hơn giá hiện tại
-│   └── AuctionClosedException.java        # Lỗi đặt giá khi phiên đã kết thúc
-├── service/
+│   ├── api/
+│   │   ├── AuctionApiClient.java         # Gọi các API liên quan đến sản phẩm & phiên đấu giá từ Client
+│   │   └── AuthApiClient.java            # Gọi các API liên quan đến đăng ký & đăng nhập từ Client
+│   ├── AuctionClient.java                # Khởi chạy ứng dụng giao diện JavaFX phía Client
+│   └── ClientConnection.java             # Quản lý luồng gửi/nhận gói tin qua Socket TCP với Server
+├── controller/
+│   ├── admin/
+│   │   └── AdminDashboardController.java # Điều khiển màn hình quản trị của Admin
 │   ├── auction/
-│   │   ├── AuctionManager.java      # Điều phối toàn bộ phiên đấu giá
-│   │   └── SnipingProtector.java    # Logic tự động gia hạn thời gian nếu có bid phút cuối
+│   │   ├── AuctionController.java        # Điều khiển giao diện phòng đấu giá chính
+│   │   ├── CreateItemController.java     # Điều khiển giao diện đăng bán sản phẩm mới
+│   │   ├── ItemDetailController.java     # Điều khiển giao diện chi tiết sản phẩm và đặt giá
+│   │   └── MyItemsController.java        # Điều khiển giao diện danh sách vật phẩm của bản thân
 │   ├── auth/
-│   │   ├── AuthService.java         # Xác thực tài khoản
-│   │   └── PasswordHasher.java      # Mã hóa mật khẩu (BCrypt)
-│   ├── bidding/
-│   │   ├── BidProcessor.java        # Xử lý logic so sánh giá, cập nhật Winner
-│   │   └── AutoBidAgent.java        # Logic cho Bot hoặc tính năng tự động đặt giá
+│   │   ├── LoginController.java          # Điều khiển màn hình đăng nhập
+│   │   └── RegisterController.java       # Điều khiển màn hình đăng ký
+│   ├── component/
+│   │   └── DateTimePicker.java           # Thành phần UI chọn ngày/giờ tuỳ chỉnh
+│   └── navigation/
+│       ├── MainLayoutController.java     # Quản lý bố cục ứng dụng và thanh menu điều hướng
+│       └── WelcomeController.java        # Điều khiển màn hình chào mừng ban đầu
+├── dao/
+│   ├── AutoBidDAO.java                   # Thao tác CSDL SQLite cho cấu hình tự động đấu giá
+│   ├── BidTransactionDAO.java            # Thao tác CSDL SQLite lưu vết lịch sử các lượt đặt giá
+│   ├── ItemDAO.java                      # Thao tác CSDL SQLite cho thông tin các vật phẩm
+│   └── UserDAO.java                      # Thao tác CSDL SQLite cho thông tin người dùng
+├── dto/
+│   ├── auth/
+│   │   ├── LoginRequest.java             # Gói dữ liệu gửi yêu cầu đăng nhập
+│   │   └── RegisterRequest.java          # Gói dữ liệu gửi yêu cầu đăng ký
+│   └── bid/
+│       ├── AutoBidRequest.java           # Gói dữ liệu thiết lập tự động đặt giá
+│       └── BidRequest.java               # Gói dữ liệu gửi lượt đặt giá
+├── entity/
+│   ├── bid/
+│   │   ├── AutoBid.java                  # Thực thể cấu hình tự động đấu giá (giá trần tối đa)
+│   │   └── BidTransaction.java           # Thực thể chi tiết một lượt đặt giá cụ thể
 │   ├── factory/
-│   │   ├── ItemFactory.java         # Khởi tạo các loại Item (Electronics, Art,...)
-│   │   └── AuctionFactory.java      # Tạo các kiểu phiên (English, Dutch Auction)
+│   │   └── ItemFactory.java              # Factory khởi tạo các loại sản phẩm (Art, Electronics,...)
+│   ├── items/
+│   │   ├── Art.java                      # Lớp vật phẩm nghệ thuật kế thừa từ Item
+│   │   ├── Electronics.java              # Lớp vật phẩm điện tử kế thừa từ Item
+│   │   ├── Item.java                     # Lớp thực thể cơ sở trừu tượng cho mọi vật phẩm đấu giá
+│   │   └── Vehicle.java                  # Lớp vật phẩm phương tiện kế thừa từ Item
+│   ├── message/
+│   │   └── Message.java                  # Định dạng gói tin giao tiếp qua Socket (JSON) giữa Client-Server
+│   ├── user/
+│   │   ├── Admin.java                    # Thực thể người dùng quản trị viên
+│   │   ├── Bidder.java                   # Thực thể người dùng đấu giá
+│   │   ├── Seller.java                   # Thực thể người dùng bán hàng
+│   │   └── User.java                     # Thực thể cơ sở cho người dùng (ID, username, balance)
+│   └── Entity.java                       # Interface hoặc lớp cơ sở cho mọi thực thể trong CSDL
+├── event/
+│   ├── BidNotificationListener.java      # Lớp lắng nghe sự kiện thay đổi giá để gửi thông báo
+│   └── BidObserver.java                  # Interface Observer định nghĩa hành vi quan sát lượt đấu giá
+├── exception/
+│   ├── AuctionClosedException.java       # Ngoại lệ khi phiên đấu giá đã kết thúc nhưng vẫn đặt giá
+│   ├── AuctionException.java             # Ngoại lệ cơ sở cho các lỗi nghiệp vụ trong hệ thống
+│   ├── AuthenticationException.java      # Ngoại lệ xảy ra khi đăng nhập thất bại
+│   └── InvalidBidException.java          # Ngoại lệ đặt giá không hợp lệ (thấp hơn giá tối thiểu yêu cầu)
+├── server/
+│   ├── handler/
+│   │   ├── AdminHandler.java             # Xử lý các yêu cầu quản lý người dùng của Admin
+│   │   ├── AuthHandler.java              # Xử lý các yêu cầu đăng nhập/đăng ký từ client
+│   │   ├── BidHandler.java               # Xử lý yêu cầu đặt giá trực tiếp và tự động đấu giá
+│   │   ├── ItemHandler.java              # Xử lý các nghiệp vụ liên quan đến vật phẩm đấu giá
+│   │   └── PaymentHandler.java           # Xử lý nạp tiền, thanh toán đơn hàng thành công, huỷ đơn
+│   └── AuctionServer.java                # Khởi chạy socket server, quản lý kết nối và xử lý yêu cầu
+├── service/
+│   ├── analytics/
+│   │   └── AnalyticsService.java         # Dịch vụ tính toán số liệu thống kê phiên đấu giá
+│   ├── auction/
+│   │   ├── AntiSniping.java              # Logic tự động gia hạn thời gian nếu có bid ở những giây cuối
+│   │   └── AuctionManager.java           # Bộ quản lý trung tâm điều phối trạng thái mọi phiên đấu giá
+│   ├── auth/
+│   │   └── AuthService.java              # Dịch vụ xử lý đăng nhập, đăng ký và bảo mật tài khoản
+│   ├── bidding/
+│   │   ├── AutoBidder.java               # Xử lý logic tự động khớp đặt giá thay người dùng (Proxy Bidding)
+│   │   ├── BidAnalytics.java             # Dịch vụ phân tích lịch sử và bước giá của sản phẩm
+│   │   └── BiddingService.java           # Nghiệp vụ xử lý đặt giá, so khớp và kiểm tra tính hợp lệ
+│   ├── item/
+│   │   └── ItemService.java              # Nghiệp vụ quản lý, truy xuất và thay đổi thông tin sản phẩm
+│   ├── network/
+│   │   └── AuctionNetworkService.java    # Đóng gói và điều hướng thông tin truyền tải qua mạng
 │   ├── notification/
-│   │   ├── NotificationService.java # Gửi thông báo đến Client
-│   │   └── Subject.java             # Interface trong Observer Pattern
+│   │   └── NotificationService.java      # Quản lý danh sách người theo dõi và gửi thông báo cập nhật
 │   ├── realtime/
-│   │   └── CountdownTimer.java      # Quản lý đồng hồ đếm ngược cho mỗi Item
-│   └── scheduler/
-│       └── AuctionTask.java         # Task chạy ngầm để đóng/mở phiên theo giờ
-└── util/                        # (Bổ sung) Các tiện ích dùng chung
-    ├── DatabaseConnection.java  # Singleton quản lý kết nối SQLite
-    └── Validator.java           # Kiểm tra dữ liệu đầu vào
+│   │   └── RealtimeNotifier.java         # Phát thông báo thay đổi thời gian thực tới tất cả client
+│   ├── scheduler/
+│   │   ├── AuctionScheduler.java         # Lập lịch chạy ngầm để đóng/mở phiên đấu giá tự động
+│   │   └── BidTask.java                  # Nhiệm vụ lập lịch đóng/mở định kỳ cho một sản phẩm cụ thể
+│   └── strategy/
+│       ├── BiddingStrategy.java          # Chiến lược đặt giá (Strategy Pattern)
+│       └── DefaultBiddingStrategy.java   # Chiến lược đặt giá mặc định của hệ thống
+└── util/
+    ├── AuctionUIHelper.java              # Hỗ trợ hiển thị và định dạng các thành phần JavaFX
+    ├── DBHelper.java                     # Quản lý kết nối Database SQLite (Singleton Pattern)
+    ├── DialogManager.java                # Hiển thị các hộp thoại Alert/Confirm/Error thống nhất
+    └── HashGen.java                      # Tiện ích băm và xác thực mật khẩu người dùng (BCrypt)
 ```
 
 ---
@@ -97,7 +149,7 @@ src/main/java/com/auction/
 
 Sau khi build dự án bằng Maven, file `.jar` thực thi sẽ nằm tại thư mục:
 
-`target/Auction-System-Group7-pi-1.0-SNAPSHOT.jar`
+`target/auction-system-1.0-SNAPSHOT.jar`
 
 *(Lưu ý: Tên file có thể thay đổi tùy theo phiên bản trong file `pom.xml`)*
 
